@@ -1,0 +1,64 @@
+import RoutesComponent from './components/RoutesComponent';
+import { PrimeReactProvider } from 'primereact/api';
+import 'primereact/resources/themes/lara-light-cyan/theme.css';
+import GlobalStyle from './GlobalStyle';
+import { useEffect, useRef } from 'react';
+import { Toast } from 'primereact/toast';
+import { generalStore } from './stores/generalStore';
+import { observer } from 'mobx-react-lite';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequester } from './utils/apiRequester';
+import { CURRENT_USER } from './config/urls';
+import { IUser } from './interface/IUser';
+import { routes } from './config/routes';
+
+const App = observer(() => {
+	const toast = useRef<Toast>(null);
+
+	const { isLoading, isError } = useQuery<IUser>({
+		queryKey: ['userData'],
+		queryFn: async () => {
+			try {
+				const response = await apiRequester.get<IUser>(CURRENT_USER);
+
+				return response.data;
+			} catch (e) {
+				throw new Error('Не удалось получить данные');
+			}
+		},
+		retry: false,
+	});
+
+	const isMatchingRoute = (path: string, routes: string[]) => {
+		return routes.some((route) => {
+			const regexPattern = route.replace(/\/:\w+/g, '/[^/]+');
+			const regex = new RegExp(`^${regexPattern}$`);
+			return regex.test(path);
+		});
+	};
+
+	useEffect(() => {
+		const accessUrls = Object.values(routes).map((i) => (i.isUnauth ? i.path : ''));
+		if (isError && !isMatchingRoute(location.pathname, accessUrls)) {
+			localStorage.removeItem('accessToken');
+			sessionStorage.removeItem('accessToken');
+			location.href = routes.main.path;
+		}
+	}, [isError]);
+
+	useEffect(() => {
+		if (toast.current && !generalStore.toastRef.current) {
+			generalStore.toastRef.current = toast.current;
+		}
+	}, [toast.current]);
+
+	return (
+		<PrimeReactProvider>
+			<Toast ref={toast} />
+			<GlobalStyle />
+			{!isLoading && <RoutesComponent />}
+		</PrimeReactProvider>
+	);
+});
+
+export default App;
