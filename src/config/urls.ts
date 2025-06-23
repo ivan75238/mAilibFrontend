@@ -6,3 +6,5 @@ export const RESEND_CODE = '/resendCode';
 export const VERIFY = '/verify';
 export const SEND_CHANGE_PASSWORD = '/sendChangePassword';
 export const CHANGE_PASSWORD = '/changePassword';
+export const BOOKS_SEARCH = '/books/search';
+export const GET_BOOK = (id: string | number) => `/books/book/${id}`;

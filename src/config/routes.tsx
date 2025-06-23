@@ -8,10 +8,11 @@ import RegistrationPage from '../pages/RegistrationPage';
 import VerifyPage from '../pages/VerifyPage';
 import ForgottenPage from '../pages/ForgottenPage';
 import ChangePasswordPage from '../pages/ChangePasswordPage';
+import BookPage from '../pages/BookPage';
 
 export interface Route {
 	path: string;
-	element: () => JSX.Element;
+	element: () => JSX.Element | null;
 	layout: (props: PropsWithChildren) => JSX.Element;
 	guard?: FC<any>;
 	title?: string;
@@ -73,6 +74,14 @@ export const routes: Routes = {
 		path: '/my-books',
 		link: () => '/my-books',
 		element: () => <div />,
+		guard: AuthGuard,
+		layout: MainLayout,
+		title: 'main',
+	},
+	book: {
+		path: '/book/:id',
+		link: (id: string | number) => `/book/${id}`,
+		element: BookPage,
 		guard: AuthGuard,
 		layout: MainLayout,
 		title: 'main',

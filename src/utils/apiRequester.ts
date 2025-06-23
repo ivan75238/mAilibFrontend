@@ -56,8 +56,9 @@ const handle401Error = async (error: any) => {
 			localStorage.removeItem('accessToken');
 			sessionStorage.removeItem('accessToken');
 			const refresh_token = localStorage.getItem('refreshToken');
+			const refresh_token_session = sessionStorage.getItem('refreshToken');
 
-			if (!refresh_token) return null;
+			if (!refresh_token && !refresh_token_session) return null;
 
 			const response = await apiRequester.post<{
 				accessToken: string;

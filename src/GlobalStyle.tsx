@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -45,6 +45,14 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Gilroy';
     src: url('./assets/fonts/Gilroy-Black.ttf') format('ttf');
     font-weight: 900;
+  }
+
+  .p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item:hover {
+      background: #efe3fd !important;
+    }
+
+  .p-autocomplete-panel{
+    border-radius: 12px;
   }
 `;
 
