@@ -3,24 +3,31 @@ import styled from 'styled-components';
 
 interface IProps extends ButtonProps {
 	height?: number;
+	width?: number;
 	outlined?: boolean;
 }
 
-const Button = ({ height, outlined, ...props }: IProps) => {
+const Button = ({ height, width, outlined, ...props }: IProps) => {
 	return (
 		<ButtonPrimereactStyled
 			height={height}
+			width={width}
 			outlined={!!outlined}
 			{...props}
 		/>
 	);
 };
 
-const ButtonPrimereactStyled = styled(ButtonPrimereact)<{ height?: number; outlined: boolean }>`
-	width: 100%;
+const ButtonPrimereactStyled = styled(ButtonPrimereact)<{
+	height?: number;
+	width?: number;
+	outlined: boolean;
+}>`
+	width: ${({ width }) => (width ? `${width}px` : '100%')};
 	height: ${({ height }) => (height ? `${height}px` : undefined)};
 	background: linear-gradient(90.76deg, #b373ff 0%, #f85593 59.61%, #ffd24c 106.79%);
 	border: 0px;
+	border-radius: 12px;
 
 	${({ outlined }) =>
 		outlined &&
@@ -44,7 +51,7 @@ const ButtonPrimereactStyled = styled(ButtonPrimereact)<{ height?: number; outli
       
       background: linear-gradient(90.76deg, #b373ff 0%, #f85593 59.61%, #ffd24c 106.79%);
       padding: 2px; /* Толщина границы */
-      border-radius: 8px; /* Должно совпадать с border-radius кнопки */
+      border-radius: 12px; /* Должно совпадать с border-radius кнопки */
       
       /* Смещаем позади контента */
       z-index: -1;

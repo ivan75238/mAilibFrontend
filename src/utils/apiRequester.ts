@@ -38,10 +38,10 @@ const handleOtherError = (error: any) => {
 		error.response.status < 500 &&
 		error.response.status !== 401
 	) {
-		generalStore.showError(error.response.data.message);
+		generalStore.showError(error.response.data.message || error.response.data.error);
 		return Promise.reject(error);
 	} else if (error.response.status >= 500) {
-		generalStore.showError(error.response.data.message);
+		generalStore.showError(error.response.data.message || error.response.data.error);
 		return Promise.reject(error);
 	} else {
 		return Promise.reject(error);

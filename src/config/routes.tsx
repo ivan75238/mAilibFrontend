@@ -9,10 +9,14 @@ import VerifyPage from '../pages/VerifyPage';
 import ForgottenPage from '../pages/ForgottenPage';
 import ChangePasswordPage from '../pages/ChangePasswordPage';
 import BookPage from '../pages/BookPage';
+import BookIcon from '../svg/BookIcon';
+import FamilyIcon from '../svg/FamilyIcon';
+import FamilyPage from '../pages/FamilyPage';
 
 export interface Route {
 	path: string;
 	element: () => JSX.Element | null;
+	icon?: JSX.Element;
 	layout: (props: PropsWithChildren) => JSX.Element;
 	guard?: FC<any>;
 	title?: string;
@@ -76,7 +80,8 @@ export const routes: Routes = {
 		element: () => <div />,
 		guard: AuthGuard,
 		layout: MainLayout,
-		title: 'main',
+		title: 'Мои книги',
+		icon: <BookIcon />,
 	},
 	book: {
 		path: '/book/:id',
@@ -86,6 +91,15 @@ export const routes: Routes = {
 		layout: MainLayout,
 		title: 'main',
 	},
+	family: {
+		path: '/family',
+		link: () => `/family`,
+		element: FamilyPage,
+		guard: AuthGuard,
+		layout: MainLayout,
+		title: 'Семья',
+		icon: <FamilyIcon />,
+	},
 };
 
-export const menu = [routes.main];
+export const menu = [routes.myBooks, routes.family];

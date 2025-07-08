@@ -6,4 +6,5 @@ export interface IUser {
 	email: string;
 	gender: string;
 	birthday: string;
+	family_id?: string;
 }

@@ -2,16 +2,37 @@ import { observer } from 'mobx-react-lite';
 import styled from 'styled-components';
 import SeperatorMenuLine from '../../svg/SeperatorMenuLine';
 import UserBlock from '../UserBlock';
+import { menu } from '../../config/routes';
+import MenuItem from './MenuItem';
+import LogoutButton from './LogoutButton';
+import useUserData from '../../hooks/useUserData';
 
 const Menu = observer(() => {
+	const { data } = useUserData();
+
+	if (!data) return null;
+
 	return (
 		<MainWrapper>
-			<TopWrapper></TopWrapper>
+			<TopWrapper>
+				{menu.map((item) => {
+					return (
+						<MenuItem
+							key={item.path}
+							{...item}
+						/>
+					);
+				})}
+			</TopWrapper>
 			<Line>
 				<SeperatorMenuLine />
 			</Line>
 			<BottomWrapper>
-				<UserBlock />
+				<UserBlock
+					user={data}
+					colorNumber={0}
+				/>
+				<LogoutButton />
 			</BottomWrapper>
 		</MainWrapper>
 	);
@@ -30,17 +51,16 @@ const TopWrapper = styled.div`
 	flex-direction: column;
 	width: 100%;
 	height: calc(100% - 202px);
-	padding-top: 52px;
-	padding-left: 59px;
+	padding-top: 40px;
 `;
 
 const BottomWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
+	gap: 32px;
 	width: 100%;
 	height: 200px;
-	padding-top: 32px;
-	padding-left: 59px;
+	padding: 32px 14px 0 59px;
 `;
 
 const Line = styled.div`

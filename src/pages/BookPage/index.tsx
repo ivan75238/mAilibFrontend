@@ -34,8 +34,6 @@ const BookPage = () => {
 
 	if (isLoading || !data) return null;
 
-	console.log('data.image_big', data);
-
 	return (
 		<Wrapper>
 			<LeftColumn>

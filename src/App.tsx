@@ -6,28 +6,13 @@ import { useEffect, useRef } from 'react';
 import { Toast } from 'primereact/toast';
 import { generalStore } from './stores/generalStore';
 import { observer } from 'mobx-react-lite';
-import { useQuery } from '@tanstack/react-query';
-import { apiRequester } from './utils/apiRequester';
-import { CURRENT_USER } from './config/urls';
-import { IUser } from './interface/IUser';
 import { routes } from './config/routes';
+import useUserData from './hooks/useUserData';
 
 const App = observer(() => {
 	const toast = useRef<Toast>(null);
 
-	const { isLoading, isError } = useQuery<IUser>({
-		queryKey: ['userData'],
-		queryFn: async () => {
-			try {
-				const response = await apiRequester.get<IUser>(CURRENT_USER);
-
-				return response.data;
-			} catch (e) {
-				throw new Error('Не удалось получить данные');
-			}
-		},
-		retry: false,
-	});
+	const { isLoading, isError } = useUserData();
 
 	const isMatchingRoute = (path: string, routes: string[]) => {
 		return routes.some((route) => {
