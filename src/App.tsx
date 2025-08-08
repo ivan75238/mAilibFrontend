@@ -8,6 +8,7 @@ import { generalStore } from './stores/generalStore';
 import { observer } from 'mobx-react-lite';
 import { routes } from './config/routes';
 import useUserData from './hooks/useUserData';
+import 'primeicons/primeicons.css';
 
 const App = observer(() => {
 	const toast = useRef<Toast>(null);

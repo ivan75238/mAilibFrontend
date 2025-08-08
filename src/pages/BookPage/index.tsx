@@ -2,17 +2,23 @@ import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { IBook } from '../../interface/IBook';
 import { apiRequester } from '../../utils/apiRequester';
-import { GET_BOOK } from '../../config/urls';
+import { FAMILY_GET, GET_BOOK, GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK } from '../../config/urls';
 import { useNavigate, useParams } from 'react-router-dom';
 import { routes } from '../../config/routes';
 import BookEmptyImageIcon from '../../svg/BookEmptyImageIcon';
-import Button from '../../components/Button';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { MegaMenu } from 'primereact/megamenu';
+import { MenuItem } from 'primereact/menuitem';
+import AddBookInLibraryModal from './AddBookInLibraryModal';
+import { IFamily } from '../../interface/IFamily';
+import useUserData from '../../hooks/useUserData';
 
 const BookPage = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
+	const { data: userData } = useUserData();
 	const [showMore, setShowMore] = useState(false);
+	const [visibleAddModal, setVisibleAddModal] = useState(false);
 
 	if (!id) {
 		navigate(routes.main.path);
@@ -32,7 +38,83 @@ const BookPage = () => {
 		},
 	});
 
-	if (isLoading || !data) return null;
+	const { isLoading: isLoadingFamily, data: familyData } = useQuery<IFamily>({
+		queryKey: [`family`, userData?.id],
+		queryFn: async () => {
+			try {
+				const response = await apiRequester.get<IFamily>(FAMILY_GET);
+
+				return response.data;
+			} catch (e) {
+				throw new Error('Не удалось получить данные');
+			}
+		},
+	});
+
+	const { isLoading: isLoadingExistInFamily, data: usersDostnHaveBookInFamily } = useQuery<
+		string[]
+	>({
+		queryKey: [`usersDostnHaveBookInFamily`, id],
+		queryFn: async () => {
+			try {
+				const response = await apiRequester.get<string[]>(
+					GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK(id)
+				);
+
+				return response.data;
+			} catch (e) {
+				throw new Error('Не удалось получить данные');
+			}
+		},
+	});
+
+	const bookActions = useMemo(() => {
+		if (!data) {
+			return [];
+		}
+
+		const obj = [
+			{
+				label: data.is_read_by_user
+					? 'Прочитано'
+					: data.is_own_by_user
+					? 'Добавлено'
+					: 'Не добавлено',
+				icon: 'pi pi-box',
+				items: [
+					[
+						{
+							items: [
+								{
+									label: 'Добавить в библиотеку',
+									disabled: data.is_own_by_user && !usersDostnHaveBookInFamily?.length,
+									command: () => setVisibleAddModal(true),
+								},
+								{
+									label: 'Удалить из библиотеки',
+									disabled: !data.is_own_by_user,
+									command: () => {
+										//
+									},
+								},
+								{
+									label: 'Отметить как прочитанную',
+									disabled: !data.is_read_by_user,
+									command: () => {
+										//
+									},
+								},
+							],
+						},
+					],
+				],
+			},
+		] as MenuItem[];
+
+		return obj;
+	}, [data, familyData]);
+
+	if (isLoading || !data || isLoadingExistInFamily || isLoadingFamily) return null;
 
 	return (
 		<Wrapper>
@@ -45,11 +127,12 @@ const BookPage = () => {
 						<p>{data.name}</p>
 					</EmptyImageWrapper>
 				)}
-				<Button
-					label={'Добавить'}
-					onClick={() => null}
-					height={60}
-				/>
+				<ButtonAddedWrapper>
+					<MegaMenu
+						model={bookActions}
+						breakpoint='960px'
+					/>
+				</ButtonAddedWrapper>
 			</LeftColumn>
 			<RightColumn>
 				<BookNameTitle>{data.name}</BookNameTitle>
@@ -70,6 +153,13 @@ const BookPage = () => {
 					{!showMore && <ShowMoreButton onClick={() => setShowMore(true)}>Далее</ShowMoreButton>}
 				</DescriptionWrapper>
 			</RightColumn>
+			{visibleAddModal && (
+				<AddBookInLibraryModal
+					bookId={id}
+					usersDostnHaveBookInFamily={usersDostnHaveBookInFamily || []}
+					onClose={() => setVisibleAddModal(false)}
+				/>
+			)}
 		</Wrapper>
 	);
 };
@@ -188,7 +278,7 @@ const DescriptionText = styled.div<{ showMore: boolean }>`
 				text-overflow: ellipsis;
 			`;
 		} else {
-			return `overflow-y: auto;`
+			return `overflow-y: auto;`;
 		}
 	}}
 `;
@@ -200,6 +290,80 @@ const ShowMoreButton = styled.div`
 	font-size: 28px;
 	line-height: 34px;
 	color: #bf8afc;
+`;
+
+const ButtonAddedWrapper = styled.div`
+	> div {
+		background: linear-gradient(90.76deg, #b373ff 0%, #f85593 59.61%, #ffd24c 106.79%);
+		border: 0px;
+		border-radius: 12px;
+
+		> ul {
+			width: 100%;
+			flex-wrap: unset;
+
+			> li {
+				width: 100%;
+
+				> div {
+					&:hover {
+						background: transparent;
+					}
+
+					> a {
+						cursor: default;
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+
+						> span {
+							color: white;
+						}
+
+						> svg {
+							color: white;
+							cursor: pointer;
+						}
+					}
+				}
+
+				> .p-megamenu-panel {
+					width: 100%;
+					background: transparent;
+					margin-top: 10px;
+
+					> ::before {
+						content: '';
+						position: absolute;
+						top: 0;
+						left: 0;
+						right: 0;
+						bottom: 0;
+
+						background: linear-gradient(90.76deg, #b373ff 0%, #f85593 59.61%, #ffd24c 106.79%);
+						padding: 2px; /* Толщина границы */
+						border-radius: 12px; /* Должно совпадать с border-radius кнопки */
+
+						/* Смещаем позади контента */
+						z-index: -1;
+
+						/* Обрезаем лишнее, чтобы осталась только рамка */
+						-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+						-webkit-mask-composite: xor;
+						mask-composite: exclude;
+					}
+
+					ul {
+						width: 100%;
+					}
+
+					.p-megamenu-submenu-header {
+						display: none;
+					}
+				}
+			}
+		}
+	}
 `;
 
 export default BookPage;

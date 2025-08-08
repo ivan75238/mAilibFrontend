@@ -12,6 +12,7 @@ import BookPage from '../pages/BookPage';
 import BookIcon from '../svg/BookIcon';
 import FamilyIcon from '../svg/FamilyIcon';
 import FamilyPage from '../pages/FamilyPage';
+import MyBooksPage from '../pages/MyBooksPage';
 
 export interface Route {
 	path: string;
@@ -77,7 +78,7 @@ export const routes: Routes = {
 	myBooks: {
 		path: '/my-books',
 		link: () => '/my-books',
-		element: () => <div />,
+		element: MyBooksPage,
 		guard: AuthGuard,
 		layout: MainLayout,
 		title: 'Мои книги',

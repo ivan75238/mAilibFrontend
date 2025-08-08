@@ -13,4 +13,6 @@ export interface IBook {
 	authors: IAuthor[];
 	genres: IGenre[];
 	cycles: ICycle[];
+	is_own_by_user: boolean;
+	is_read_by_user: boolean;
 }
