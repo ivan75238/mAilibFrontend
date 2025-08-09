@@ -13,10 +13,16 @@ import Button from '../../components/Button';
 interface IProps {
 	onClose: () => void;
 	bookId: string;
+	bookType: string;
 	usersDostnHaveBookInFamily: string[];
 }
 
-const AddBookInLibraryModal = ({ onClose, bookId, usersDostnHaveBookInFamily }: IProps) => {
+const AddBookInLibraryModal = ({
+	onClose,
+	bookId,
+	bookType,
+	usersDostnHaveBookInFamily,
+}: IProps) => {
 	const [selectedOwners, setSelectedOwners] = useState<string[]>([]);
 	const [selectedReaders, setSelectedReaders] = useState<string[]>([]);
 	const { data: userData } = useUserData();
@@ -79,7 +85,7 @@ const AddBookInLibraryModal = ({ onClose, bookId, usersDostnHaveBookInFamily }: 
 
 	const mutation = useMutation({
 		mutationFn: async () => {
-			await apiRequester.post(ADD_BOOK_TO_LIBRARY(bookId), {
+			await apiRequester.post(ADD_BOOK_TO_LIBRARY(bookType, bookId), {
 				owner_ids: selectedOwners,
 				reader_ids: selectedReaders,
 			});

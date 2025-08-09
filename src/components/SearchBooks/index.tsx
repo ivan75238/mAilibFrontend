@@ -10,9 +10,12 @@ import { IBook } from '../../interface/IBook';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../../config/routes';
 import SeachIcon from '../../svg/SeachIcon';
+import { ISearchResult } from '../../interface/ISearchResult';
+import { ISearchResultGroup } from '../../interface/ISearchResultGroup';
+import BookEmptyImageIcon from '../../svg/BookEmptyImageIcon';
 
 const SearchBooks = observer(() => {
-	const [books, setBooks] = useState<IBook[]>([]);
+	const [results, setResults] = useState<ISearchResultGroup[]>();
 	const [value, setValue] = useState('');
 	const navigate = useNavigate();
 
@@ -23,32 +26,49 @@ const SearchBooks = observer(() => {
 
 		return (
 			<ItemWrapper>
-				«{item.name}» {item.authors.map((i) => i.name).join(', ')}
+				{item.image_small || item.image_big ? (
+					<img src={`https://fantlab.ru/${item.image_small}`} />
+				) : (
+					<EmptyImageWrapper>
+						<BookEmptyImageIcon />
+					</EmptyImageWrapper>
+				)}
+				<span>
+					«{item.name}» {item.authors.map((i) => i.name).join(', ')}
+				</span>
 			</ItemWrapper>
 		);
 	}, []);
 
 	const mutation = useMutation({
 		mutationFn: (searchString: string) => {
-			return apiRequester.get<IBook[]>(`${BOOKS_SEARCH}?q=${searchString}`);
+			return apiRequester.get<ISearchResult>(`${BOOKS_SEARCH}?q=${searchString}`);
 		},
 	});
 
 	const search = useCallback(async (event: AutoCompleteCompleteEvent) => {
 		try {
 			const response = await mutation.mutateAsync(event.query.toLowerCase());
-			if (response.data.length) {
-				setBooks(response.data);
-			} else {
-				setBooks([
+			if (response.data.books.length || response.data.books.length) {
+				const groups: ISearchResultGroup[] = [
 					{
-						id: '-1',
-						authors: [],
-						name: '',
-						genres: [],
-						cycles: [],
-						is_own_by_user: false,
-						is_read_by_user: false,
+						label: 'Произведения',
+						code: 'fantlab_works',
+						items: response.data.books,
+					},
+					{
+						label: 'Издания',
+						code: 'fantlab_edition',
+						items: response.data.editions,
+					},
+				];
+				setResults(groups);
+			} else {
+				setResults([
+					{
+						label: 'Ничего не найдено',
+						code: 'empty',
+						items: [],
 					},
 				]);
 			}
@@ -57,25 +77,41 @@ const SearchBooks = observer(() => {
 		}
 	}, []);
 
+	const groupedItemTemplate = (item: ISearchResultGroup) => {
+		return (
+			<div className='flex align-items-center'>
+				<div>{item.label}</div>
+			</div>
+		);
+	};
+
 	return (
 		<MainWrapper>
 			<IconWrapper>
 				<SeachIcon />
 			</IconWrapper>
-			<AutoComplete
-				field='name'
-				suggestions={books}
-				completeMethod={search}
-				onSelect={(e) =>
-					e.value.id !== '-1' && navigate(routes.book.link(e.value.id || e.value.fantlab_id))
-				}
-				itemTemplate={itemTemplate}
-				placeholder={'Поиск'}
-				minLength={3}
-				value={value}
-				inputClassName='search-input'
-				onChange={(e) => setValue(typeof e.value === 'string' ? e.value : '')}
-			/>
+			{
+				//@ts-ignore
+				<AutoComplete
+					field='name'
+					suggestions={results}
+					completeMethod={search}
+					itemTemplate={itemTemplate}
+					onSelect={(e) => {
+						const val = e.value as unknown as IBook;
+
+						val.id !== '-1' && navigate(routes.book.link(val.type, val.id || val.fantlab_id));
+					}}
+					placeholder={'Поиск'}
+					minLength={3}
+					value={value}
+					inputClassName='search-input'
+					onChange={(e) => setValue(typeof e.value === 'string' ? e.value : '')}
+					optionGroupLabel='label'
+					optionGroupChildren='items'
+					optionGroupTemplate={groupedItemTemplate}
+				/>
+			}
 		</MainWrapper>
 	);
 });
@@ -101,8 +137,10 @@ const IconWrapper = styled.div`
 `;
 
 const ItemWrapper = styled.div`
-	display: block;
-	padding: 10px 0px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 0px;
 	font-style: normal;
 	font-weight: 400;
 	font-size: 16px;
@@ -111,6 +149,28 @@ const ItemWrapper = styled.div`
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+
+	img {
+		height: 60px;
+	}
+`;
+
+const EmptyImageWrapper = styled.div`
+	width: 38px;
+	height: 60px;
+	background: #e4cffd;
+	border-radius: 8px;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		position: absolute;
+		top: 22px;
+		width: 20px;
+		height: auto;
+	}
 `;
 
 export default SearchBooks;

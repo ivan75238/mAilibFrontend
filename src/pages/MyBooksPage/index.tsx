@@ -38,7 +38,7 @@ const MyBooksPage = () => {
 				<DataTable
 					value={data}
 					selectionMode='single'
-					onSelectionChange={(e) => navigate(routes.book.link(e.value.id || e.value.fantlab_id))}
+					onSelectionChange={(e) => navigate(routes.book.link(e.value.type, e.value.id || e.value.fantlab_id))}
 					removableSort
 					scrollable
 					scrollHeight='100%'

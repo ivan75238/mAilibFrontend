@@ -27,4 +27,5 @@ export interface IBookInLibrary {
 	readers: string;
 	authors: string;
 	genres: string;
+	type: 'fantlab_work' | 'fantlab_edition' | 'inner_db_work';
 }

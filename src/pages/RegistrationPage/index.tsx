@@ -221,6 +221,11 @@ const Row = styled.div`
 	display: flex;
 	width: 100%;
 	gap: 24px;
+
+	> div {
+		width: 50%;
+		min-width: 50%;
+	}
 `;
 
 export default RegistrationPage;

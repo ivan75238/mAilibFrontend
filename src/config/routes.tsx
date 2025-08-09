@@ -85,8 +85,8 @@ export const routes: Routes = {
 		icon: <BookIcon />,
 	},
 	book: {
-		path: '/book/:id',
-		link: (id: string | number) => `/book/${id}`,
+		path: '/book/:type/:id',
+		link: (type: string, id: string | number) => `/book/${type}/${id}`,
 		element: BookPage,
 		guard: AuthGuard,
 		layout: MainLayout,

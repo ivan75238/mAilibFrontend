@@ -14,22 +14,22 @@ import { IFamily } from '../../interface/IFamily';
 import useUserData from '../../hooks/useUserData';
 
 const BookPage = () => {
-	const { id } = useParams();
+	const { id, type } = useParams();
 	const navigate = useNavigate();
 	const { data: userData } = useUserData();
 	const [showMore, setShowMore] = useState(false);
 	const [visibleAddModal, setVisibleAddModal] = useState(false);
 
-	if (!id) {
+	if (!id || !type) {
 		navigate(routes.main.path);
 		return null;
 	}
 
 	const { isLoading, data } = useQuery<IBook>({
-		queryKey: [`book`, id],
+		queryKey: [`book`, id, type],
 		queryFn: async () => {
 			try {
-				const response = await apiRequester.get<IBook>(GET_BOOK(id));
+				const response = await apiRequester.get<IBook>(GET_BOOK(type, id));
 
 				return response.data;
 			} catch (e) {
@@ -54,11 +54,11 @@ const BookPage = () => {
 	const { isLoading: isLoadingExistInFamily, data: usersDostnHaveBookInFamily } = useQuery<
 		string[]
 	>({
-		queryKey: [`usersDostnHaveBookInFamily`, id],
+		queryKey: [`usersDostnHaveBookInFamily`, id, type],
 		queryFn: async () => {
 			try {
 				const response = await apiRequester.get<string[]>(
-					GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK(id)
+					GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK(type, id)
 				);
 
 				return response.data;
@@ -165,6 +165,7 @@ const BookPage = () => {
 			{visibleAddModal && (
 				<AddBookInLibraryModal
 					bookId={id}
+					bookType={type}
 					usersDostnHaveBookInFamily={usersDostnHaveBookInFamily || []}
 					onClose={() => setVisibleAddModal(false)}
 				/>

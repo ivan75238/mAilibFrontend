@@ -15,4 +15,5 @@ export interface IBook {
 	cycles: ICycle[];
 	is_own_by_user: boolean;
 	is_read_by_user: boolean;
+	type: 'fantlab_work' | 'fantlab_edition' | 'inner_db_work';
 }

@@ -11,29 +11,27 @@ const UnauthFormWrapper = ({ children }: PropsWithChildren) => {
 	return (
 		<FormWrapper>
 			<WellcomeText>Добро пожаловать!</WellcomeText>
-			{location.pathname.indexOf('up_pas') === 0 && (
-				<Tabs>
-					<Tab
-						width={64}
-						isActive={
-							location.pathname === routes.main.path ||
-							location.pathname === routes.forgottenPassword.path
-						}
-						onClick={() => navigate(routes.main.link())}>
-						Вход
-					</Tab>
-					<Line />
-					<Tab
-						width={170}
-						isActive={
-							location.pathname !== routes.main.path &&
-							location.pathname !== routes.forgottenPassword.path
-						}
-						onClick={() => navigate(routes.registration.link())}>
-						Регистрация
-					</Tab>
-				</Tabs>
-			)}
+			<Tabs>
+				<Tab
+					width={64}
+					isActive={
+						location.pathname === routes.main.path ||
+						location.pathname === routes.forgottenPassword.path
+					}
+					onClick={() => navigate(routes.main.link())}>
+					Вход
+				</Tab>
+				<Line />
+				<Tab
+					width={170}
+					isActive={
+						location.pathname !== routes.main.path &&
+						location.pathname !== routes.forgottenPassword.path
+					}
+					onClick={() => navigate(routes.registration.link())}>
+					Регистрация
+				</Tab>
+			</Tabs>
 			{children}
 		</FormWrapper>
 	);

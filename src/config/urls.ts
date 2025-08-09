@@ -10,10 +10,13 @@ export const CHANGE_PASSWORD = '/changePassword';
 
 export const BOOKS_SEARCH = '/books/search';
 export const MY_LIBRARY = '/books/library';
-export const GET_BOOK = (id: string | number) => `/books/book/${id}`;
-export const REMOVE_BOOK_FROM_LIBRARY = (id: string | number) => `/books/book/${id}/remove`;
-export const ADD_BOOK_TO_LIBRARY = (id: string | number) => `/books/book/${id}/add`;
-export const GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK = (id: string | number) => `/books/book/${id}/existInfamily`;
+export const GET_BOOK = (type: string, id: string | number) => `/books/book/${type}/${id}`;
+export const REMOVE_BOOK_FROM_LIBRARY = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/remove`;
+export const ADD_BOOK_TO_LIBRARY = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/add`;
+export const GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/existInfamily`;
 
 export const FAMILY_CREATE = '/family/create';
 export const FAMILY_GET = '/family/get';
