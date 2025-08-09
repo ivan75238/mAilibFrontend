@@ -66,6 +66,7 @@ const BookPage = () => {
 				throw new Error('Не удалось получить данные');
 			}
 		},
+		enabled: !isLoading,
 	});
 
 	const bookActions = useMemo(() => {
@@ -140,17 +141,25 @@ const BookPage = () => {
 					<p>
 						Автор: <span>{data.authors.map((i) => i.name).join(', ')}</span>
 					</p>
-					<p>
-						Входит в серию: <span>{data.cycles.map((i) => i.name).join(', ')}</span>
-					</p>
+					{data.cycles.length > 0 && (
+						<p>
+							Входит в серию: <span>{data.cycles.map((i) => i.name).join(', ')}</span>
+						</p>
+					)}
 				</AuthorAndCyclesWrapper>
 				<DescriptionWrapper>
 					<DescriptionHeader>О книге</DescriptionHeader>
 					<DescriptionText
 						showMore={showMore}
-						dangerouslySetInnerHTML={{ __html: (data.description || '').replace(/\n/g, '<br>') }}
+						dangerouslySetInnerHTML={{
+							__html: data.description
+								? (data.description || '').replace(/\n/g, '<br>')
+								: 'Описание отсутствует',
+						}}
 					/>
-					{!showMore && <ShowMoreButton onClick={() => setShowMore(true)}>Далее</ShowMoreButton>}
+					{data.description && !showMore && (
+						<ShowMoreButton onClick={() => setShowMore(true)}>Далее</ShowMoreButton>
+					)}
 				</DescriptionWrapper>
 			</RightColumn>
 			{visibleAddModal && (
@@ -315,6 +324,10 @@ const ButtonAddedWrapper = styled.div`
 						display: flex;
 						align-items: center;
 						justify-content: space-between;
+
+						.pi-box {
+							opacity: 0;
+						}
 
 						> span {
 							color: white;

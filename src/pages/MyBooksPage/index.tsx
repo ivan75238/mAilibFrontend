@@ -36,42 +36,90 @@ const MyBooksPage = () => {
 
 	return (
 		<Wrapper>
-			<DataTable
-				value={data}
-				tableStyle={{ width: '100%' }}>
-				<Column
-					field='name'
-					header='Название'
-				/>
-				<Column
-					field='author'
-					header='Автор'
-					body={authorBodyTemplate}
-				/>
-				<Column
-					field='janres'
-					header='Жанры'
-					body={jenresBodyTemplate}
-				/>
-				<Column
-					field='date'
-					header='Прочитали'
-					body={readersBodyTemplate}
-				/>
-			</DataTable>
+			<PageTitle>Мои книги</PageTitle>
+			<WrapperInner>
+				<DataTable
+					value={data}
+					selectionMode='single'
+					scrollable
+					scrollHeight='100%'
+					tableStyle={{ width: '100%' }}>
+					<Column
+						field='name'
+						header='Название'
+					/>
+					<Column
+						field='author'
+						header='Автор'
+						body={authorBodyTemplate}
+					/>
+					<Column
+						field='janres'
+						header='Жанры'
+						body={jenresBodyTemplate}
+					/>
+					<Column
+						field='date'
+						header='Прочитали'
+						body={readersBodyTemplate}
+					/>
+				</DataTable>
+			</WrapperInner>
+			<AnaliticBlock>
+				<ParamBlock>
+					<span>Всего:</span>
+					<b>{data.length}</b>
+				</ParamBlock>
+			</AnaliticBlock>
 		</Wrapper>
 	);
 };
 
+const PageTitle = styled.div`
+	font-style: normal;
+	font-weight: 400;
+	font-size: 36px;
+	line-height: 44px;
+	color: #262626;
+	padding-bottom: 28px;
+`;
+
 const Wrapper = styled.div`
 	width: 100%;
-	gap: 54px;
+	height: calc(100% - 40px);
+	flex-direction: column;
 	display: flex;
 	padding: 52px 64px;
 
 	> div {
 		width: 100%;
 	}
+`;
+
+const WrapperInner = styled.div`
+	width: 100%;
+	height: calc(100% - 40px);
+	gap: 54px;
+	display: flex;
+
+	> div {
+		width: 100%;
+	}
+`;
+
+const AnaliticBlock = styled.div`
+	width: 100%;
+	height: 40px;
+	gap: 16px;
+	display: flex;
+	align-items: center;
+	margin-top: 16px;
+`;
+
+const ParamBlock = styled.div`
+	gap: 8px;
+	display: flex;
+	align-items: center;
 `;
 
 export default MyBooksPage;
