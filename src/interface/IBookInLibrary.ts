@@ -5,10 +5,10 @@ interface ReaderInfo {
 }
 
 interface IAuthorInBookLibrary {
-  author_id: string;
-  fantlab_id?: number;
-  country?: string;
-  author_name: string;
+	author_id: string;
+	fantlab_id?: number;
+	country?: string;
+	author_name: string;
 }
 
 interface IGenreInBookLibrary {
@@ -24,4 +24,7 @@ export interface IBookInLibrary {
 	readers_info: ReaderInfo[];
 	authors_info: IAuthorInBookLibrary[];
 	genres_info: IGenreInBookLibrary[];
+	readers: string;
+	authors: string;
+	genres: string;
 }

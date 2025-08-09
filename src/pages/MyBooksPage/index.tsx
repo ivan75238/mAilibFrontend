@@ -5,32 +5,29 @@ import { MY_LIBRARY } from '../../config/urls';
 import { IBookInLibrary } from '../../interface/IBookInLibrary';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { useNavigate } from 'react-router-dom';
+import { routes } from '../../config/routes';
 
 const MyBooksPage = () => {
+	const navigate = useNavigate();
+
 	const { isLoading, data } = useQuery<IBookInLibrary[]>({
 		queryKey: [`my-books`],
 		queryFn: async () => {
 			try {
 				const response = await apiRequester.get<IBookInLibrary[]>(MY_LIBRARY);
 
-				return response.data;
+				return response.data.map((i) => ({
+					...i,
+					authors: i.authors_info.map((i) => i.author_name).join(', '),
+					genres: i.genres_info.map((i) => i.genre_name).join(', '),
+					readers: i.readers_info.map((i) => i.reader_name).join(', '),
+				}));
 			} catch (e) {
 				throw new Error('Не удалось получить данные');
 			}
 		},
 	});
-
-	const authorBodyTemplate = (item: IBookInLibrary) => {
-		return item.authors_info.map((i) => i.author_name).join(', ');
-	};
-
-	const jenresBodyTemplate = (item: IBookInLibrary) => {
-		return item.genres_info.map((i) => i.genre_name).join(', ');
-	};
-
-	const readersBodyTemplate = (item: IBookInLibrary) => {
-		return item.readers_info.map((i) => i.reader_name).join(', ');
-	};
 
 	if (isLoading || !data) return null;
 
@@ -41,27 +38,30 @@ const MyBooksPage = () => {
 				<DataTable
 					value={data}
 					selectionMode='single'
+					onSelectionChange={(e) => navigate(routes.book.link(e.value.id || e.value.fantlab_id))}
+					removableSort
 					scrollable
 					scrollHeight='100%'
 					tableStyle={{ width: '100%' }}>
 					<Column
+						sortable
 						field='name'
 						header='Название'
 					/>
 					<Column
-						field='author'
+						sortable
+						field='authors'
 						header='Автор'
-						body={authorBodyTemplate}
 					/>
 					<Column
-						field='janres'
+						sortable
+						field='genres'
 						header='Жанры'
-						body={jenresBodyTemplate}
 					/>
 					<Column
-						field='date'
+						sortable
+						field='readers'
 						header='Прочитали'
-						body={readersBodyTemplate}
 					/>
 				</DataTable>
 			</WrapperInner>

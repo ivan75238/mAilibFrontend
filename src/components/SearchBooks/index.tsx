@@ -17,6 +17,10 @@ const SearchBooks = observer(() => {
 	const navigate = useNavigate();
 
 	const itemTemplate = useCallback((item: IBook) => {
+		if (item.id === '-1') {
+			return <ItemWrapper>Ничего не найдено</ItemWrapper>;
+		}
+
 		return (
 			<ItemWrapper>
 				«{item.name}» {item.authors.map((i) => i.name).join(', ')}
@@ -33,7 +37,21 @@ const SearchBooks = observer(() => {
 	const search = useCallback(async (event: AutoCompleteCompleteEvent) => {
 		try {
 			const response = await mutation.mutateAsync(event.query.toLowerCase());
-			setBooks(response.data);
+			if (response.data.length) {
+				setBooks(response.data);
+			} else {
+				setBooks([
+					{
+						id: '-1',
+						authors: [],
+						name: '',
+						genres: [],
+						cycles: [],
+						is_own_by_user: false,
+						is_read_by_user: false,
+					},
+				]);
+			}
 		} catch (e) {
 			generalStore.showError('Ошибка поиска, попробуйте позже или обратитеся в тех. поддержку');
 		}
@@ -48,7 +66,9 @@ const SearchBooks = observer(() => {
 				field='name'
 				suggestions={books}
 				completeMethod={search}
-				onSelect={(e) => navigate(routes.book.link(e.value.id || e.value.fantlab_id))}
+				onSelect={(e) =>
+					e.value.id !== '-1' && navigate(routes.book.link(e.value.id || e.value.fantlab_id))
+				}
 				itemTemplate={itemTemplate}
 				placeholder={'Поиск'}
 				minLength={3}
