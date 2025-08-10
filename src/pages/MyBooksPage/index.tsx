@@ -38,7 +38,9 @@ const MyBooksPage = () => {
 				<DataTable
 					value={data}
 					selectionMode='single'
-					onSelectionChange={(e) => navigate(routes.book.link(e.value.type, e.value.id || e.value.fantlab_id))}
+					onSelectionChange={(e) =>
+						navigate(routes.book.link(e.value.type, e.value.id || e.value.fantlab_id))
+					}
 					removableSort
 					scrollable
 					scrollHeight='100%'
@@ -47,21 +49,25 @@ const MyBooksPage = () => {
 						sortable
 						field='name'
 						header='Название'
+						filter
 					/>
 					<Column
 						sortable
 						field='authors'
 						header='Автор'
+						filter
 					/>
 					<Column
 						sortable
 						field='genres'
 						header='Жанры'
+						filter
 					/>
 					<Column
 						sortable
 						field='readers'
 						header='Прочитали'
+						filter
 					/>
 				</DataTable>
 			</WrapperInner>

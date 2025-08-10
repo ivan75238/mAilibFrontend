@@ -121,7 +121,11 @@ const BookPage = () => {
 		<Wrapper>
 			<LeftColumn>
 				{data.image_big ? (
-					<img src={`https://fantlab.ru/${data.image_big}`} />
+					type === 'inner_db_work' ? (
+						<img src={data.image_big} />
+					) : (
+						<img src={`https://fantlab.ru/${data.image_big}`} />
+					)
 				) : (
 					<EmptyImageWrapper>
 						<BookEmptyImageIcon />

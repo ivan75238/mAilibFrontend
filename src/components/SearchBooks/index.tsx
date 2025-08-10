@@ -13,21 +13,27 @@ import SeachIcon from '../../svg/SeachIcon';
 import { ISearchResult } from '../../interface/ISearchResult';
 import { ISearchResultGroup } from '../../interface/ISearchResultGroup';
 import BookEmptyImageIcon from '../../svg/BookEmptyImageIcon';
+import AddNewBookInDbModal from './AddNewBookInDbModal';
 
 const SearchBooks = observer(() => {
 	const [results, setResults] = useState<ISearchResultGroup[]>();
 	const [value, setValue] = useState('');
 	const navigate = useNavigate();
+	const [visibleAddModal, setVisibleAddModal] = useState(false);
 
 	const itemTemplate = useCallback((item: IBook) => {
 		if (item.id === '-1') {
-			return <ItemWrapper>Ничего не найдено</ItemWrapper>;
+			return <ItemWrapper>{item.name}</ItemWrapper>;
 		}
 
 		return (
 			<ItemWrapper>
 				{item.image_small || item.image_big ? (
-					<img src={`https://fantlab.ru/${item.image_small}`} />
+					item.type === 'inner_db_work' ? (
+						<img src={item.image_big} />
+					) : (
+						<img src={`https://fantlab.ru/${item.image_small || item.image_big}`} />
+					)
 				) : (
 					<EmptyImageWrapper>
 						<BookEmptyImageIcon />
@@ -50,25 +56,47 @@ const SearchBooks = observer(() => {
 		try {
 			const response = await mutation.mutateAsync(event.query.toLowerCase());
 			if (response.data.books.length || response.data.books.length) {
-				const groups: ISearchResultGroup[] = [
-					{
+				const groups: ISearchResultGroup[] = [];
+
+				if (response.data.books.length) {
+					groups.push({
 						label: 'Произведения',
 						code: 'fantlab_works',
 						items: response.data.books,
-					},
-					{
+					});
+				}
+				if (response.data.editions.length) {
+					groups.push({
 						label: 'Издания',
 						code: 'fantlab_edition',
 						items: response.data.editions,
-					},
-				];
+					});
+				}
+				if (response.data.inner.length) {
+					groups.push({
+						label: 'В книгах пользователей',
+						code: 'inner',
+						items: response.data.inner,
+					});
+				}
 				setResults(groups);
 			} else {
 				setResults([
 					{
 						label: 'Ничего не найдено',
 						code: 'empty',
-						items: [],
+						items: [
+							{
+								id: '-1',
+								name: 'Добавить вручную',
+								authors: [],
+								type: 'inner_db_work',
+								cycles: [],
+								genres: [],
+								is_own_by_user: false,
+								is_read_by_user: false,
+							},
+						],
 					},
 				]);
 			}
@@ -100,7 +128,11 @@ const SearchBooks = observer(() => {
 					onSelect={(e) => {
 						const val = e.value as unknown as IBook;
 
-						val.id !== '-1' && navigate(routes.book.link(val.type, val.id || val.fantlab_id));
+						if (val.id === '-1') {
+							setVisibleAddModal(true);
+						} else {
+							navigate(routes.book.link(val.type, val.id || val.fantlab_id));
+						}
 					}}
 					placeholder={'Поиск'}
 					minLength={3}
@@ -110,8 +142,10 @@ const SearchBooks = observer(() => {
 					optionGroupLabel='label'
 					optionGroupChildren='items'
 					optionGroupTemplate={groupedItemTemplate}
+					scrollHeight='400px'
 				/>
 			}
+			{visibleAddModal && <AddNewBookInDbModal onClose={() => setVisibleAddModal(false)} />}
 		</MainWrapper>
 	);
 });

@@ -100,7 +100,7 @@ const AddBookInLibraryModal = ({
 
 	return (
 		<Dialog
-			header='Добавить книгу в библиотеку'
+			header='Добавление книги в библиотеку'
 			visible={true}
 			style={{ width: '450px' }}
 			onHide={onClose}>
