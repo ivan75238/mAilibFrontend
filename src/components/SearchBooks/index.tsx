@@ -55,7 +55,7 @@ const SearchBooks = observer(() => {
 	const search = useCallback(async (event: AutoCompleteCompleteEvent) => {
 		try {
 			const response = await mutation.mutateAsync(event.query.toLowerCase());
-			if (response.data.books.length || response.data.books.length) {
+			if (response.data.books.length || response.data.editions.length) {
 				const groups: ISearchResultGroup[] = [];
 
 				if (response.data.books.length) {
