@@ -3,27 +3,25 @@ import { useCallback, useMemo, useState } from 'react';
 import useUserData from '../../hooks/useUserData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequester } from '../../utils/apiRequester';
-import { ADD_BOOK_TO_LIBRARY } from '../../config/urls';
+import { MARK_BOOK_AS_READED } from '../../config/urls';
 import styled from 'styled-components';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
-import Checkbox from '../../components/Checkbox';
 import Button from '../../components/Button';
 import useFamilyData from '../../hooks/useFamilyData';
 
-interface IProps {
+interface IMarkAsReadBookModalProps {
 	onClose: () => void;
 	bookId: string;
 	bookType: string;
-	usersDoesntHaveBookInFamily: string[];
+	usersDoesntReadBookInFamily: string[];
 }
 
-const AddBookInLibraryModal = ({
+const MarkAsReadBookModal = ({
 	onClose,
 	bookId,
 	bookType,
-	usersDoesntHaveBookInFamily,
-}: IProps) => {
-	const [selectedOwners, setSelectedOwners] = useState<string[]>([]);
+	usersDoesntReadBookInFamily,
+}: IMarkAsReadBookModalProps) => {
 	const [selectedReaders, setSelectedReaders] = useState<string[]>([]);
 	const { data: userData } = useUserData();
 	const { data } = useFamilyData();
@@ -35,46 +33,33 @@ const AddBookInLibraryModal = ({
 		}
 
 		return data.users
-			.filter((i) => usersDoesntHaveBookInFamily.includes(i.id))
-			.filter((i) => !selectedOwners.includes(i.id))
+			.filter((i) => usersDoesntReadBookInFamily.includes(i.id))
+			.filter((i) => !selectedReaders.includes(i.id))
 			.map((i) => {
 				return {
 					name: `${i.last_name} ${i.first_name}`,
 					code: i.id,
 				};
 			});
-	}, [data, selectedOwners, usersDoesntHaveBookInFamily]);
+	}, [data, selectedReaders, usersDoesntReadBookInFamily]);
 
-	const onSelectOwner = useCallback(
+	const onSelectReader = useCallback(
 		(e: DropdownChangeEvent) => {
-			setSelectedOwners([...selectedOwners, e.value.code]);
+			setSelectedReaders([...selectedReaders, e.value.code]);
 		},
-		[selectedOwners]
+		[selectedReaders]
 	);
 
-	const onOwnerDelete = useCallback(
+	const onReaderDelete = useCallback(
 		(userId: string) => {
-			setSelectedOwners(selectedOwners.filter((i) => i !== userId));
-		},
-		[selectedOwners]
-	);
-
-	const onCheckReader = useCallback(
-		(userId: string) => {
-			if (selectedReaders.includes(userId)) {
-				setSelectedReaders(selectedReaders.filter((i) => i !== userId));
-				return;
-			} else {
-				setSelectedReaders([...selectedReaders, userId]);
-			}
+			setSelectedReaders(selectedReaders.filter((i) => i !== userId));
 		},
 		[selectedReaders]
 	);
 
 	const mutation = useMutation({
 		mutationFn: async () => {
-			await apiRequester.post(ADD_BOOK_TO_LIBRARY(bookType, bookId), {
-				owner_ids: selectedOwners,
+			await apiRequester.post(MARK_BOOK_AS_READED(bookType, bookId), {
 				reader_ids: selectedReaders,
 			});
 			queryClient.refetchQueries({ queryKey: [`book`, bookId, bookType] });
@@ -86,11 +71,11 @@ const AddBookInLibraryModal = ({
 	const onAdd = useCallback(() => {
 		mutation.mutate();
 		onClose();
-	}, [selectedReaders, selectedOwners]);
+	}, [selectedReaders]);
 
 	return (
 		<Dialog
-			header='Добавление книги в библиотеку'
+			header='Пометить прочитанной'
 			visible={true}
 			style={{ width: '450px' }}
 			onHide={onClose}>
@@ -98,13 +83,13 @@ const AddBookInLibraryModal = ({
 				{userData?.family_id ? (
 					<>
 						<Dropdown
-							onChange={onSelectOwner}
+							onChange={onSelectReader}
 							options={usersOptions}
 							placeholder='Выберите членов семьи'
 							className='w-full'
 							optionLabel='name'
 						/>
-						{selectedOwners.map((ownerId) => {
+						{selectedReaders.map((ownerId) => {
 							const owner = data?.users.find((i) => i.id === ownerId);
 							return (
 								<Row key={ownerId}>
@@ -112,14 +97,9 @@ const AddBookInLibraryModal = ({
 										{owner?.last_name} {owner?.first_name}
 									</UserName>
 									<div>
-										<Checkbox
-											label='Прочитано'
-											checked={!!selectedReaders.includes(ownerId)}
-											onChange={() => onCheckReader(ownerId)}
-										/>
 										<i
 											className='pi pi-times'
-											onClick={() => onOwnerDelete(ownerId)}
+											onClick={() => onReaderDelete(ownerId)}
 										/>
 									</div>
 								</Row>
@@ -132,7 +112,7 @@ const AddBookInLibraryModal = ({
 				<Button
 					label={'Добавить'}
 					onClick={onAdd}
-					disabled={!selectedOwners.length}
+					disabled={!selectedReaders.length}
 				/>
 			</FormWrapper>
 		</Dialog>
@@ -178,4 +158,4 @@ const UserName = styled.div`
 	color: #262626;
 `;
 
-export default AddBookInLibraryModal;
+export default MarkAsReadBookModal;

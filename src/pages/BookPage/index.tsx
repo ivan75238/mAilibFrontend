@@ -1,86 +1,81 @@
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
-import { IBook } from '../../interface/IBook';
-import { apiRequester } from '../../utils/apiRequester';
-import { FAMILY_GET, GET_BOOK, GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK } from '../../config/urls';
 import { useNavigate, useParams } from 'react-router-dom';
-import { routes } from '../../config/routes';
-import BookEmptyImageIcon from '../../svg/BookEmptyImageIcon';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { MegaMenu } from 'primereact/megamenu';
 import { MenuItem } from 'primereact/menuitem';
+import { routes } from '../../config/routes';
+import BookEmptyImageIcon from '../../svg/BookEmptyImageIcon';
 import AddBookInLibraryModal from './AddBookInLibraryModal';
-import { IFamily } from '../../interface/IFamily';
 import useUserData from '../../hooks/useUserData';
+import useFamilyData from '../../hooks/useFamilyData';
+import useBookData from '../../hooks/useBookData';
+import UserListComponent from './UserListComponent';
+import useUsersDoesntHaveBookInFamily from '../../hooks/useUsersDoesntHaveBookInFamily';
+import useUsersDoesntReadBookInFamily from '../../hooks/useUsersDoesntReadBookInFamily';
+import RemoveBookFromLibraryModal from './RemoveBookFromLibraryModal';
+import MarkAsReadBookModal from './MarkAsReadBookModal';
+import UnmarkAsReadBookModal from './UnmarkAsReadBookModal';
 
 const BookPage = () => {
 	const { id, type } = useParams();
 	const navigate = useNavigate();
 	const { data: userData } = useUserData();
+	const { data: familyData, isLoading: isLoadingFamily } = useFamilyData();
 	const [showMore, setShowMore] = useState(false);
 	const [visibleAddModal, setVisibleAddModal] = useState(false);
+	const [visibleRemoveModal, setVisibleRemoveModal] = useState(false);
+	const [visibleMarkAsReadModal, setVisibleMarkAsReadModal] = useState(false);
+	const [visibleUnmarkAsReadModal, setVisibleUnmarkAsReadModal] = useState(false);
+	const descriptionRef = useRef<HTMLDivElement>(null);
 
 	if (!id || !type) {
 		navigate(routes.main.path);
 		return null;
 	}
 
-	const { isLoading, data } = useQuery<IBook>({
-		queryKey: [`book`, id, type],
-		queryFn: async () => {
-			try {
-				const response = await apiRequester.get<IBook>(GET_BOOK(type, id));
-
-				return response.data;
-			} catch (e) {
-				throw new Error('Не удалось получить данные');
-			}
-		},
-	});
-
-	const { isLoading: isLoadingFamily, data: familyData } = useQuery<IFamily>({
-		queryKey: [`family`, userData?.id],
-		queryFn: async () => {
-			try {
-				const response = await apiRequester.get<IFamily>(FAMILY_GET);
-
-				return response.data;
-			} catch (e) {
-				throw new Error('Не удалось получить данные');
-			}
-		},
-	});
-
-	const { isLoading: isLoadingExistInFamily, data: usersDostnHaveBookInFamily } = useQuery<
-		string[]
-	>({
-		queryKey: [`usersDostnHaveBookInFamily`, id, type],
-		queryFn: async () => {
-			try {
-				const response = await apiRequester.get<string[]>(
-					GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK(type, id)
-				);
-
-				return response.data;
-			} catch (e) {
-				throw new Error('Не удалось получить данные');
-			}
-		},
-		enabled: !isLoading,
-	});
+	const { data, isLoading } = useBookData(id, type);
+	const { isLoading: isLoadingExistInFamily, data: usersDoesntHaveBookInFamily } =
+		useUsersDoesntHaveBookInFamily(id, type);
+	const { isLoading: isLoadingReadInFamily, data: usersDoesntReadBookInFamily } =
+		useUsersDoesntReadBookInFamily(id, type);
 
 	const bookActions = useMemo(() => {
 		if (!data) {
 			return [];
 		}
 
+		let title = '';
+		let disabledButtonAddBook = false;
+		let disabledButtonDeleteBook = false;
+		let disabledButtonMarkAsReadBook = false;
+		let disabledButtonUnmarkAsReadBook = false;
+
+		if (userData?.family_id) {
+			title = 'Действия';
+			disabledButtonAddBook = usersDoesntHaveBookInFamily?.length === 0;
+			disabledButtonDeleteBook = usersDoesntHaveBookInFamily?.length === familyData?.users?.length;
+			disabledButtonMarkAsReadBook = usersDoesntReadBookInFamily?.length === 0;
+			disabledButtonUnmarkAsReadBook =
+				usersDoesntReadBookInFamily?.length === familyData?.users?.length;
+			usersDoesntReadBookInFamily?.length === familyData?.users?.length;
+		} else {
+			if (data.is_read_by_user) {
+				title = 'Прочитано';
+				disabledButtonAddBook = true;
+				disabledButtonMarkAsReadBook = true;
+			} else if (data.is_own_by_user) {
+				title = 'Добавлено';
+				disabledButtonAddBook = true;
+			} else {
+				title = 'Не добавлено';
+				disabledButtonDeleteBook = true;
+				disabledButtonMarkAsReadBook = true;
+			}
+		}
+
 		const obj = [
 			{
-				label: data.is_read_by_user
-					? 'Прочитано'
-					: data.is_own_by_user
-					? 'Добавлено'
-					: 'Не добавлено',
+				label: title,
 				icon: 'pi pi-box',
 				items: [
 					[
@@ -88,22 +83,23 @@ const BookPage = () => {
 							items: [
 								{
 									label: 'Добавить в библиотеку',
-									disabled: data.is_own_by_user && !usersDostnHaveBookInFamily?.length,
+									disabled: disabledButtonAddBook,
 									command: () => setVisibleAddModal(true),
 								},
 								{
 									label: 'Удалить из библиотеки',
-									disabled: !data.is_own_by_user,
-									command: () => {
-										//
-									},
+									disabled: disabledButtonDeleteBook,
+									command: () => setVisibleRemoveModal(true),
 								},
 								{
 									label: 'Отметить как прочитанную',
-									disabled: !data.is_read_by_user,
-									command: () => {
-										//
-									},
+									disabled: disabledButtonMarkAsReadBook,
+									command: () => setVisibleMarkAsReadModal(true),
+								},
+								{
+									label: 'Снять отметку о прочитанном',
+									disabled: disabledButtonUnmarkAsReadBook,
+									command: () => setVisibleUnmarkAsReadModal(true),
 								},
 							],
 						},
@@ -115,7 +111,24 @@ const BookPage = () => {
 		return obj;
 	}, [data, familyData]);
 
-	if (isLoading || !data || isLoadingExistInFamily || isLoadingFamily) return null;
+	const owners = useMemo(() => {
+		if (!familyData) {
+			return [];
+		}
+
+		return familyData.users.filter((i) => !usersDoesntHaveBookInFamily?.includes(i.id));
+	}, [data, usersDoesntHaveBookInFamily]);
+
+	const readers = useMemo(() => {
+		if (!familyData) {
+			return [];
+		}
+
+		return familyData.users.filter((i) => !usersDoesntReadBookInFamily?.includes(i.id));
+	}, [data, usersDoesntReadBookInFamily]);
+
+	if (isLoading || !data || isLoadingExistInFamily || isLoadingFamily || isLoadingReadInFamily)
+		return null;
 
 	return (
 		<Wrapper>
@@ -138,6 +151,14 @@ const BookPage = () => {
 						breakpoint='960px'
 					/>
 				</ButtonAddedWrapper>
+				<UserListComponent
+					title={'Владельцы:'}
+					users={owners}
+				/>
+				<UserListComponent
+					title={'Прочитали:'}
+					users={readers}
+				/>
 			</LeftColumn>
 			<RightColumn>
 				<BookNameTitle>{data.name}</BookNameTitle>
@@ -154,6 +175,7 @@ const BookPage = () => {
 				<DescriptionWrapper>
 					<DescriptionHeader>О книге</DescriptionHeader>
 					<DescriptionText
+						ref={descriptionRef}
 						showMore={showMore}
 						dangerouslySetInnerHTML={{
 							__html: data.description
@@ -161,17 +183,42 @@ const BookPage = () => {
 								: 'Описание отсутствует',
 						}}
 					/>
-					{data.description && !showMore && (
-						<ShowMoreButton onClick={() => setShowMore(true)}>Далее</ShowMoreButton>
-					)}
+					{descriptionRef.current &&
+						descriptionRef.current.offsetHeight > 250 &&
+						data.description &&
+						!showMore && <ShowMoreButton onClick={() => setShowMore(true)}>Далее</ShowMoreButton>}
 				</DescriptionWrapper>
 			</RightColumn>
 			{visibleAddModal && (
 				<AddBookInLibraryModal
 					bookId={id}
 					bookType={type}
-					usersDostnHaveBookInFamily={usersDostnHaveBookInFamily || []}
+					usersDoesntHaveBookInFamily={usersDoesntHaveBookInFamily || []}
 					onClose={() => setVisibleAddModal(false)}
+				/>
+			)}
+			{visibleRemoveModal && (
+				<RemoveBookFromLibraryModal
+					bookId={id}
+					bookType={type}
+					usersDoesntHaveBookInFamily={usersDoesntHaveBookInFamily || []}
+					onClose={() => setVisibleRemoveModal(false)}
+				/>
+			)}
+			{visibleMarkAsReadModal && (
+				<MarkAsReadBookModal
+					bookId={id}
+					bookType={type}
+					usersDoesntReadBookInFamily={usersDoesntReadBookInFamily || []}
+					onClose={() => setVisibleMarkAsReadModal(false)}
+				/>
+			)}
+			{visibleUnmarkAsReadModal && (
+				<UnmarkAsReadBookModal
+					bookId={id}
+					bookType={type}
+					usersDoesntReadBookInFamily={usersDoesntReadBookInFamily || []}
+					onClose={() => setVisibleUnmarkAsReadModal(false)}
 				/>
 			)}
 		</Wrapper>
@@ -280,7 +327,8 @@ const DescriptionText = styled.div<{ showMore: boolean }>`
 	line-height: 31px;
 	text-indent: 16px;
 	color: #262626;
-	height: ${({ showMore }) => (!showMore ? '287px' : '400px')};
+	height: 100%;
+	max-height: ${({ showMore }) => (!showMore ? '287px' : '400px')};
 
 	${({ showMore }) => {
 		if (!showMore) {
@@ -319,7 +367,9 @@ const ButtonAddedWrapper = styled.div`
 			> li {
 				width: 100%;
 
-				> div {
+				> .p-menuitem-content {
+					background: transparent;
+
 					&:hover {
 						background: transparent;
 					}
@@ -347,7 +397,6 @@ const ButtonAddedWrapper = styled.div`
 
 				> .p-megamenu-panel {
 					width: 100%;
-					background: transparent;
 					margin-top: 10px;
 
 					> ::before {

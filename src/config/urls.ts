@@ -16,8 +16,14 @@ export const REMOVE_BOOK_FROM_LIBRARY = (type: string, id: string | number) =>
 	`/books/book/${type}/${id}/remove`;
 export const ADD_BOOK_TO_LIBRARY = (type: string, id: string | number) =>
 	`/books/book/${type}/${id}/add`;
-export const GET_USERS_IN_FAMILY_WHO_DOSTN_HAVE_BOOK = (type: string, id: string | number) =>
-	`/books/book/${type}/${id}/existInfamily`;
+export const MARK_BOOK_AS_READED = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/markAsRead`;
+export const UNMARK_BOOK_AS_READED = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/removeMark`;
+export const GET_USERS_IN_FAMILY_WHO_DOESNT_HAVE_BOOK = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/existInFamily`;
+export const GET_USERS_IN_FAMILY_WHO_DOESNT_READ_BOOK = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/readedInFamily`;
 
 export const FAMILY_CREATE = '/family/create';
 export const FAMILY_GET = '/family/get';

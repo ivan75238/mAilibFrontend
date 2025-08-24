@@ -1,30 +1,19 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { apiRequester } from '../../../../utils/apiRequester';
-import { FAMILY_DISSOLVE, FAMILY_GET } from '../../../../config/urls';
+import { FAMILY_DISSOLVE } from '../../../../config/urls';
 import { observer } from 'mobx-react-lite';
 import { IFamily } from '../../../../interface/IFamily';
 import { useMemo } from 'react';
 import useUserData from '../../../../hooks/useUserData';
 import UserBlock from '../../../../components/UserBlock';
 import Button from '../../../../components/Button';
+import useFamilyData from '../../../../hooks/useFamilyData';
 
 const MyFamilyList = observer(() => {
 	const queryClient = useQueryClient();
 	const { data: userData } = useUserData();
-
-	const { data } = useQuery<IFamily>({
-		queryKey: [`family`, userData?.id],
-		queryFn: async () => {
-			try {
-				const response = await apiRequester.get<IFamily>(FAMILY_GET);
-
-				return response.data;
-			} catch (e) {
-				throw new Error('Не удалось получить данные');
-			}
-		},
-	});
+	const { data } = useFamilyData();
 
 	const myFamily = useMemo(() => {
 		if (!data) {

@@ -5,15 +5,19 @@ import { IUser } from '../../interface/IUser';
 interface IProps {
 	user: IUser;
 	colorNumber: number;
+	tooltipContent?: string;
+	hideName?: boolean;
 }
 
-const UserBlock = observer(({ user, colorNumber }: IProps) => {
+const UserBlock = observer(({ user, colorNumber, tooltipContent, hideName }: IProps) => {
 	return (
-		<MainWrapper>
+		<MainWrapper
+			className='user'
+			data-pr-tooltip={tooltipContent}>
 			<UserIconWrapper colorNumber={colorNumber}>
 				{user.first_name.substring(0, 1).toLocaleUpperCase()}
 			</UserIconWrapper>
-			{user.first_name} {user.last_name}
+			{!hideName && `${user.first_name} ${user.last_name}`}
 		</MainWrapper>
 	);
 });

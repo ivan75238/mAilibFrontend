@@ -1,31 +1,27 @@
 import { Dialog } from 'primereact/dialog';
 import { useCallback, useMemo, useState } from 'react';
-import useUserData from '../../hooks/useUserData';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequester } from '../../utils/apiRequester';
-import { ADD_BOOK_TO_LIBRARY } from '../../config/urls';
+import { REMOVE_BOOK_FROM_LIBRARY } from '../../config/urls';
 import styled from 'styled-components';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
-import Checkbox from '../../components/Checkbox';
 import Button from '../../components/Button';
 import useFamilyData from '../../hooks/useFamilyData';
 
-interface IProps {
+interface IRemoveBookFromLibraryModalProps {
 	onClose: () => void;
 	bookId: string;
 	bookType: string;
 	usersDoesntHaveBookInFamily: string[];
 }
 
-const AddBookInLibraryModal = ({
+const RemoveBookFromLibraryModal = ({
 	onClose,
 	bookId,
 	bookType,
 	usersDoesntHaveBookInFamily,
-}: IProps) => {
+}: IRemoveBookFromLibraryModalProps) => {
 	const [selectedOwners, setSelectedOwners] = useState<string[]>([]);
-	const [selectedReaders, setSelectedReaders] = useState<string[]>([]);
-	const { data: userData } = useUserData();
 	const { data } = useFamilyData();
 	const queryClient = useQueryClient();
 
@@ -35,7 +31,7 @@ const AddBookInLibraryModal = ({
 		}
 
 		return data.users
-			.filter((i) => usersDoesntHaveBookInFamily.includes(i.id))
+			.filter((i) => !usersDoesntHaveBookInFamily.includes(i.id))
 			.filter((i) => !selectedOwners.includes(i.id))
 			.map((i) => {
 				return {
@@ -52,30 +48,10 @@ const AddBookInLibraryModal = ({
 		[selectedOwners]
 	);
 
-	const onOwnerDelete = useCallback(
-		(userId: string) => {
-			setSelectedOwners(selectedOwners.filter((i) => i !== userId));
-		},
-		[selectedOwners]
-	);
-
-	const onCheckReader = useCallback(
-		(userId: string) => {
-			if (selectedReaders.includes(userId)) {
-				setSelectedReaders(selectedReaders.filter((i) => i !== userId));
-				return;
-			} else {
-				setSelectedReaders([...selectedReaders, userId]);
-			}
-		},
-		[selectedReaders]
-	);
-
 	const mutation = useMutation({
 		mutationFn: async () => {
-			await apiRequester.post(ADD_BOOK_TO_LIBRARY(bookType, bookId), {
+			await apiRequester.post(REMOVE_BOOK_FROM_LIBRARY(bookType, bookId), {
 				owner_ids: selectedOwners,
-				reader_ids: selectedReaders,
 			});
 			queryClient.refetchQueries({ queryKey: [`book`, bookId, bookType] });
 			queryClient.refetchQueries({ queryKey: [`usersDoesntHaveBookInFamily`, bookId, bookType] });
@@ -86,7 +62,14 @@ const AddBookInLibraryModal = ({
 	const onAdd = useCallback(() => {
 		mutation.mutate();
 		onClose();
-	}, [selectedReaders, selectedOwners]);
+	}, [selectedOwners]);
+
+	const onOwnerDelete = useCallback(
+		(userId: string) => {
+			setSelectedOwners(selectedOwners.filter((i) => i !== userId));
+		},
+		[selectedOwners]
+	);
 
 	return (
 		<Dialog
@@ -95,42 +78,31 @@ const AddBookInLibraryModal = ({
 			style={{ width: '450px' }}
 			onHide={onClose}>
 			<FormWrapper>
-				{userData?.family_id ? (
-					<>
-						<Dropdown
-							onChange={onSelectOwner}
-							options={usersOptions}
-							placeholder='Выберите членов семьи'
-							className='w-full'
-							optionLabel='name'
-						/>
-						{selectedOwners.map((ownerId) => {
-							const owner = data?.users.find((i) => i.id === ownerId);
-							return (
-								<Row key={ownerId}>
-									<UserName>
-										{owner?.last_name} {owner?.first_name}
-									</UserName>
-									<div>
-										<Checkbox
-											label='Прочитано'
-											checked={!!selectedReaders.includes(ownerId)}
-											onChange={() => onCheckReader(ownerId)}
-										/>
-										<i
-											className='pi pi-times'
-											onClick={() => onOwnerDelete(ownerId)}
-										/>
-									</div>
-								</Row>
-							);
-						})}
-					</>
-				) : (
-					<></>
-				)}
+				<Dropdown
+					onChange={onSelectOwner}
+					options={usersOptions}
+					placeholder='Выберите членов семьи, у кого удалить книгу'
+					className='w-full'
+					optionLabel='name'
+				/>
+				{selectedOwners.map((ownerId) => {
+					const owner = data?.users.find((i) => i.id === ownerId);
+					return (
+						<Row key={ownerId}>
+							<UserName>
+								{owner?.last_name} {owner?.first_name}
+							</UserName>
+							<div>
+								<i
+									className='pi pi-times'
+									onClick={() => onOwnerDelete(ownerId)}
+								/>
+							</div>
+						</Row>
+					);
+				})}
 				<Button
-					label={'Добавить'}
+					label={'Удалить'}
 					onClick={onAdd}
 					disabled={!selectedOwners.length}
 				/>
@@ -178,4 +150,4 @@ const UserName = styled.div`
 	color: #262626;
 `;
 
-export default AddBookInLibraryModal;
+export default RemoveBookFromLibraryModal;
