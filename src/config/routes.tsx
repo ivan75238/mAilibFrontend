@@ -13,6 +13,8 @@ import BookIcon from '../svg/BookIcon';
 import FamilyIcon from '../svg/FamilyIcon';
 import FamilyPage from '../pages/FamilyPage';
 import MyBooksPage from '../pages/MyBooksPage';
+import AnalyticsIcon from '../svg/AnalyticsIcon';
+import AnalyticsPage from '../pages/AnalyticsPage';
 
 export interface Route {
 	path: string;
@@ -101,6 +103,15 @@ export const routes: Routes = {
 		title: 'Семья',
 		icon: <FamilyIcon />,
 	},
+	analytics: {
+		path: '/analytics',
+		link: () => `/analytics`,
+		element: AnalyticsPage,
+		guard: AuthGuard,
+		layout: MainLayout,
+		title: 'Аналитика',
+		icon: <AnalyticsIcon />,
+	},
 };
 
-export const menu = [routes.myBooks, routes.family];
+export const menu = [routes.myBooks, routes.family, routes.analytics];

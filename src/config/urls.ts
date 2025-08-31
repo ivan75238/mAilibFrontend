@@ -36,3 +36,6 @@ export const FAMILY_DISSOLVE = '/family/dissolve';
 export const AUTHORS_ALL = '/authors/all';
 export const GENRES_ALL = '/genres/all';
 export const CYCLES_ALL = '/cycles/all';
+
+export const ANALYTICS_FAMILY = '/analytics/family';
+export const ANALYTICS_USER = '/analytics/user';

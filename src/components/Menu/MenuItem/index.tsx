@@ -36,6 +36,11 @@ const Wrapper = styled.div<{ isActive: boolean }>`
 		&:hover {
 			color: #000000;
 		}
+
+		svg {
+			width: 32px;
+			height: 32px;
+		}
 	}
 `;
 
