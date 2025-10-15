@@ -51,7 +51,7 @@ const Wrapper = styled.div`
 		cursor: default;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		padding-left: 16px;
 	}
 `;

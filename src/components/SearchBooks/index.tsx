@@ -162,7 +162,7 @@ const MainWrapper = styled.div`
 		border-radius: 12px;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 620px) {
 		width: calc(100% - 48px);
 
 		.p-autocomplete {
@@ -207,7 +207,7 @@ const ItemWrapper = styled.div`
 		white-space: normal;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		max-width: 100%;
 	}
 `;

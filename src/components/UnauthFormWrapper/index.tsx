@@ -49,7 +49,7 @@ const FormWrapper = styled.div`
 		gap: 8px;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		position: absolute;
 		width: 100vw;
 		margin-right: 0px;
@@ -73,7 +73,7 @@ const WellcomeText = styled.div`
 		line-height: 70px;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		display: none;
 	}
 `;

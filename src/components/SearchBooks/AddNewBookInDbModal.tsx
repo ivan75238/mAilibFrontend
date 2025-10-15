@@ -505,7 +505,7 @@ const SelectorWrapper = styled.div`
 		}
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		flex-direction: column;
 
 		> div {
@@ -532,7 +532,7 @@ const ManualInputWrapper = styled.div`
 		min-width: 223px;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		> div:first-child {
 			width: 273px;
 			min-width: 273px;

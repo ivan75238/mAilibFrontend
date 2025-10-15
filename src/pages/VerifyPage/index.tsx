@@ -171,7 +171,7 @@ const InputWrapper = styled.div`
 		}
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		input {
 			height: 60px;
 			width: 50px;

@@ -191,7 +191,7 @@ const RememberWrapper = styled.div`
 		margin-bottom: 20px;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		margin-bottom: 0px;
 
 		button {

@@ -94,7 +94,7 @@ const ProjectWrapper = styled.div`
 		justify-content: center;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		display: none;
 	}
 `;

@@ -235,7 +235,7 @@ const Wrapper = styled.div`
 		padding: 16px;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		flex-direction: column;
 		overflow-y: auto;
 		max-width: calc(100vh - 84px);
@@ -264,7 +264,7 @@ const LeftColumn = styled.div`
 		}
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		width: 100%;
 		align-items: center;
 	}
@@ -312,7 +312,7 @@ const RightColumn = styled.div`
 		gap: 16px;
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		width: 100%;
 		gap: 16px;
 		padding: 0 16px;
@@ -517,7 +517,7 @@ const ButtonAddedWrapper = styled.div`
 		}
 	}
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		width: 240px;
 	}
 `;

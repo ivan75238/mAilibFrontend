@@ -55,7 +55,7 @@ const GlobalStyle = createGlobalStyle`
     border-radius: 12px;
   }
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
     .p-toast-message{
       max-width: calc(100vw - 40px);
       margin-left: 0px  !important;

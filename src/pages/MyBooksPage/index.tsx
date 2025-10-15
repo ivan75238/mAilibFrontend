@@ -70,7 +70,7 @@ const PageTitle = styled.div`
 	color: #262626;
 	padding-bottom: 28px;
 
-	@media (max-width: 375px) {
+	@media (max-width: 400px) {
 		font-size: 30px;
 		text-align: center;
 	}
