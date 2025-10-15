@@ -16,6 +16,10 @@ const Wrapper = styled.div`
 	display: flex;
 	align-items: flex-start;
 	gap: 52px;
+
+	@media (max-width: 400px) {
+		flex-direction: column;
+	}
 `;
 
 export default ExistFamilyComponent;

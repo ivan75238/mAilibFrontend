@@ -21,6 +21,10 @@ const Wrapper = styled.div`
 	flex-direction: column;
 	padding: 52px 64px;
 	position: relative;
+
+	@media (max-width: 400px) {
+		padding: 52px 30px;
+	}
 `;
 
 const PageTitle = styled.div`

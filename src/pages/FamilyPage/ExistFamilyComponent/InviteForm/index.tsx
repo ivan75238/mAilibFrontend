@@ -69,7 +69,7 @@ const InviteForm = () => {
 								placeholder={'Почта пользователя'}
 								invalid={!!errors?.email?.message}
 								errorText={errors?.email?.message}
-								width={'436px'}
+								width={'360px'}
 							/>
 						);
 					}}
@@ -103,6 +103,10 @@ const InviteUserWrapper = styled.div`
 const FieldWrapper = styled.div`
 	display: flex;
 	gap: 40px;
+
+	@media (max-width: 400px) {
+		flex-direction: column;
+	}
 `;
 
 export default InviteForm;

@@ -86,6 +86,10 @@ const Wrapper = styled.div`
 	> div {
 		width: 100%;
 	}
+
+	@media (max-width: 400px) {
+		padding: 52px 8px;
+	}
 `;
 
 const WrapperInner = styled.div`

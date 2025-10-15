@@ -72,6 +72,10 @@ const FamilyListWrapper = styled.div`
 	width: 500px;
 	gap: 16px;
 	flex-wrap: wrap;
+
+	@media (max-width: 400px) {
+		width: 360px;
+	}
 `;
 
 const TitleText = styled.div`
@@ -88,6 +92,10 @@ const UsersWrapper = styled.div`
 	flex-wrap: wrap;
 	gap: 16px;
 	width: 444px;
+
+	@media (max-width: 400px) {
+		width: 360px;
+	}
 `;
 
 export default MyFamilyList;
