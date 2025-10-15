@@ -61,6 +61,10 @@ const ProjectName = styled.div`
 	font-size: ${rem(183)};
 	text-align: center;
 	color: #ffffff;
+
+	@media (max-width: 960px) {
+		font-size: 100px;
+	}
 `;
 
 const ProjectDescription = styled.div`
@@ -68,6 +72,11 @@ const ProjectDescription = styled.div`
 	font-weight: 300;
 	font-size: ${rem(39)};
 	color: #ffffff;
+
+	@media (max-width: 960px) {
+		font-size: 30px;
+		text-align: center;
+	}
 `;
 
 const ProjectWrapper = styled.div`
@@ -79,6 +88,15 @@ const ProjectWrapper = styled.div`
 	gap: 13px;
 	position: relative;
 	z-index: 3;
+
+	@media (max-width: 960px) {
+		padding: 0px 100px 0 60px;
+		justify-content: center;
+	}
+
+	@media (max-width: 375px) {
+		display: none;
+	}
 `;
 
 const BooksImage = styled.div`
@@ -88,6 +106,10 @@ const BooksImage = styled.div`
 	width: 650px;
 	height: 430px;
 	overflow: hidden;
+
+	@media (max-width: 960px) {
+		display: none;
+	}
 `;
 
 export default UnauthLayout;

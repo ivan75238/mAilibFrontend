@@ -50,6 +50,10 @@ const Wrapper = styled.div`
 		font-size: 14px;
 		cursor: default;
 	}
+
+	@media (max-width: 375px) {
+		padding-left: 16px;
+	}
 `;
 
 export default UserListComponent;

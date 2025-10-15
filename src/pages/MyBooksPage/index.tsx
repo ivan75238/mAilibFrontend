@@ -69,6 +69,11 @@ const PageTitle = styled.div`
 	line-height: 44px;
 	color: #262626;
 	padding-bottom: 28px;
+
+	@media (max-width: 375px) {
+		font-size: 30px;
+		text-align: center;
+	}
 `;
 
 const Wrapper = styled.div`

@@ -78,7 +78,10 @@ const MarkAsReadBookModal = ({
 			header='Пометить прочитанной'
 			visible={true}
 			style={{ width: '450px' }}
-			onHide={onClose}>
+			onHide={onClose}
+			breakpoints={{
+				'375px': '375px',
+			}}>
 			<FormWrapper>
 				{userData?.family_id ? (
 					<>

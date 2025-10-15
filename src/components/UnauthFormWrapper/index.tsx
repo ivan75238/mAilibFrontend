@@ -43,6 +43,20 @@ const FormWrapper = styled.div`
 	flex-direction: column;
 	gap: 20px;
 	margin-right: 60px;
+
+	@media (max-width: 960px) {
+		width: 100%;
+		gap: 8px;
+	}
+
+	@media (max-width: 375px) {
+		position: absolute;
+		width: 100vw;
+		margin-right: 0px;
+		padding: 0 24px;
+		gap: 24px;
+		z-index: 2;
+	}
 `;
 
 const WellcomeText = styled.div`
@@ -53,6 +67,15 @@ const WellcomeText = styled.div`
 	line-height: 92px;
 	text-align: center;
 	color: #262626;
+
+	@media (max-width: 960px) {
+		font-size: ${rem(65)};
+		line-height: 70px;
+	}
+
+	@media (max-width: 375px) {
+		display: none;
+	}
 `;
 
 const Tabs = styled.div`
@@ -62,6 +85,10 @@ const Tabs = styled.div`
 	justify-content: center;
 	gap: 28px;
 	padding-left: 50px;
+
+	@media (max-width: 960px) {
+		padding-left: 20px;
+	}
 `;
 
 const Tab = styled.div<{ isActive: boolean; width: number }>`

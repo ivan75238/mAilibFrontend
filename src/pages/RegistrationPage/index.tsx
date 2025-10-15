@@ -215,6 +215,15 @@ const Wrapper = styled.div`
 	justify-content: flex-start;
 	width: 100%;
 	gap: 24px;
+
+	@media (max-width: 960px) {
+		max-height: calc(100vh - 300px);
+		overflow-y: auto;
+
+		> button {
+			min-height: 68px;
+		}
+	}
 `;
 
 const Row = styled.div`
@@ -225,6 +234,16 @@ const Row = styled.div`
 	> div {
 		width: 50%;
 		min-width: 50%;
+	}
+
+	@media (max-width: 960px) {
+		flex-direction: column;
+		gap: 24px;
+
+		> div {
+			width: 100%;
+			min-width: 100%;
+		}
 	}
 `;
 

@@ -161,6 +161,20 @@ const MainWrapper = styled.div`
 		height: 40px;
 		border-radius: 12px;
 	}
+
+	@media (max-width: 375px) {
+		width: calc(100% - 48px);
+
+		.p-autocomplete {
+			width: 100%;
+		}
+
+		.search-input {
+			width: 100%;
+			height: 40px;
+			border-radius: 12px;
+		}
+	}
 `;
 
 const IconWrapper = styled.div`
@@ -187,10 +201,20 @@ const ItemWrapper = styled.div`
 	img {
 		height: 60px;
 	}
+
+	> span {
+		overflow-wrap: break-word;
+		white-space: normal;
+	}
+
+	@media (max-width: 375px) {
+		max-width: 100%;
+	}
 `;
 
 const EmptyImageWrapper = styled.div`
 	width: 38px;
+	min-width: 38px;
 	height: 60px;
 	background: #e4cffd;
 	border-radius: 8px;

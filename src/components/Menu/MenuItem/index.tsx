@@ -3,12 +3,18 @@ import styled from 'styled-components';
 import { Route } from '../../../config/routes';
 import { NavLink, useMatch, useResolvedPath } from 'react-router-dom';
 
-const MenuItem = observer(({ path, icon, title }: Route) => {
+interface IProps {
+	setOpen: (val: boolean) => void;
+}
+
+const MenuItem = observer(({ path, icon, title, setOpen }: Route & IProps) => {
 	const resolved = useResolvedPath(path);
 	const match = useMatch({ path: resolved.pathname, end: true });
 
 	return (
-		<Wrapper isActive={!!match}>
+		<Wrapper
+			isActive={!!match}
+			onClick={() => setOpen(false)}>
 			<NavLink to={path}>
 				{icon}
 				{title}

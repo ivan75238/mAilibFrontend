@@ -1,15 +1,23 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'styled-components';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import Header from '../../components/Header';
 import Menu from '../../components/Menu';
 
 const MainLayout = observer(({ children }: PropsWithChildren) => {
+	const [open, setOpen] = useState(false);
+
 	return (
 		<MainWrapper>
-			<Header />
+			<Header
+				open={open}
+				setOpen={setOpen}
+			/>
 			<PageWrapper>
-				<Menu />
+				<Menu
+					open={open}
+					setOpen={setOpen}
+				/>
 				<ContentWrapper>{children}</ContentWrapper>
 			</PageWrapper>
 		</MainWrapper>
@@ -33,6 +41,10 @@ const ContentWrapper = styled.div`
 	display: flex;
 	width: calc(100% - 288px);
 	height: 100%;
+
+	@media (max-width: 960px) {
+		width: 100%;
+	}
 `;
 
 export default MainLayout;

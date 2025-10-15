@@ -142,6 +142,9 @@ const Wrapper = styled.div`
 	justify-content: flex-start;
 	width: 100%;
 	gap: 24px;
+
+	@media (max-width: 960px) {
+	}
 `;
 
 const InputWrapper = styled.div`
@@ -157,6 +160,24 @@ const InputWrapper = styled.div`
 		width: 80px;
 		font-size: 44px;
 	}
+
+	@media (max-width: 960px) {
+		margin-bottom: 24px;
+
+		input {
+			height: 76px;
+			width: 60px;
+			font-size: 44px;
+		}
+	}
+
+	@media (max-width: 375px) {
+		input {
+			height: 60px;
+			width: 50px;
+			font-size: 44px;
+		}
+	}
 `;
 
 const Text = styled.div`
@@ -167,6 +188,11 @@ const Text = styled.div`
 	text-align: center;
 	color: #262626;
 	margin-top: 40px;
+
+	@media (max-width: 960px) {
+		font-size: 24px;
+		margin-top: 20px;
+	}
 `;
 
 const TimerText = styled.div`

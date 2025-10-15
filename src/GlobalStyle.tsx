@@ -48,12 +48,34 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item:hover {
-      background: #efe3fd !important;
-    }
+    background: #efe3fd !important;
+  }
 
   .p-autocomplete-panel{
     border-radius: 12px;
   }
+
+	@media (max-width: 375px) {
+    .p-toast-message{
+      max-width: calc(100vw - 40px);
+      margin-left: 0px  !important;
+    }
+
+    .p-toast {
+      right: 5px !important;
+    }    
+
+    .p-autocomplete-panel {
+      width: 100%;
+      min-width: 100% !important;
+      left: 0 !important;
+    }
+
+    .p-dialog {
+      width: 375px !important;
+      z-index: 999 !important;
+    }
+	}
 `;
 
 export default GlobalStyle;

@@ -230,6 +230,16 @@ const Wrapper = styled.div`
 	gap: 54px;
 	display: flex;
 	padding: 52px 64px;
+
+	@media (max-width: 960px) {
+		padding: 16px;
+	}
+
+	@media (max-width: 375px) {
+		flex-direction: column;
+		overflow-y: auto;
+		max-width: calc(100vh - 84px);
+	}
 `;
 
 const LeftColumn = styled.div`
@@ -243,6 +253,20 @@ const LeftColumn = styled.div`
 		height: 507px;
 		filter: drop-shadow(0px 0px 12px rgba(19, 0, 32, 0.25));
 		border-radius: 8px;
+	}
+
+	@media (max-width: 960px) {
+		width: 240px;
+
+		img {
+			width: 240px;
+			height: 360px;
+		}
+	}
+
+	@media (max-width: 375px) {
+		width: 100%;
+		align-items: center;
 	}
 `;
 
@@ -270,6 +294,11 @@ const EmptyImageWrapper = styled.div`
 		text-align: center;
 		color: #743bb1;
 	}
+
+	@media (max-width: 960px) {
+		width: 240px;
+		height: 360px;
+	}
 `;
 
 const RightColumn = styled.div`
@@ -277,6 +306,17 @@ const RightColumn = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 24px;
+
+	@media (max-width: 960px) {
+		width: calc(100% - 240px);
+		gap: 16px;
+	}
+
+	@media (max-width: 375px) {
+		width: 100%;
+		gap: 16px;
+		padding: 0 16px;
+	}
 `;
 
 const BookNameTitle = styled.div`
@@ -285,6 +325,11 @@ const BookNameTitle = styled.div`
 	font-size: 40px;
 	line-height: 49px;
 	color: #262626;
+
+	@media (max-width: 960px) {
+		font-size: 24px;
+		line-height: 24px;
+	}
 `;
 
 const AuthorAndCyclesWrapper = styled.div`
@@ -304,12 +349,21 @@ const AuthorAndCyclesWrapper = styled.div`
 	span {
 		color: #262626;
 	}
+
+	@media (max-width: 960px) {
+		font-size: 20px;
+		line-height: 20px;
+	}
 `;
 
 const DescriptionWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
+
+	@media (max-width: 960px) {
+		gap: 8px;
+	}
 `;
 
 const DescriptionHeader = styled.div`
@@ -318,6 +372,11 @@ const DescriptionHeader = styled.div`
 	font-size: 32px;
 	line-height: 39px;
 	color: #262626;
+
+	@media (max-width: 960px) {
+		font-size: 24px;
+		line-height: 24px;
+	}
 `;
 
 const DescriptionText = styled.div<{ showMore: boolean }>`
@@ -343,6 +402,11 @@ const DescriptionText = styled.div<{ showMore: boolean }>`
 			return `overflow-y: auto;`;
 		}
 	}}
+
+	@media (max-width: 960px) {
+		font-size: 16px;
+		line-height: 18px;
+	}
 `;
 
 const ShowMoreButton = styled.div`
@@ -352,6 +416,11 @@ const ShowMoreButton = styled.div`
 	font-size: 28px;
 	line-height: 34px;
 	color: #bf8afc;
+
+	@media (max-width: 960px) {
+		font-size: 20px;
+		line-height: 26px;
+	}
 `;
 
 const ButtonAddedWrapper = styled.div`
@@ -430,6 +499,26 @@ const ButtonAddedWrapper = styled.div`
 				}
 			}
 		}
+	}
+
+	@media (max-width: 960px) {
+		.p-megamenu-button {
+			display: none !important;
+		}
+
+		.p-megamenu-root-list {
+			display: flex !important;
+		}
+
+		.p-megamenu-panel {
+			position: absolute !important;
+			width: auto !important;
+			background-color: #fff !important;
+		}
+	}
+
+	@media (max-width: 375px) {
+		width: 240px;
 	}
 `;
 

@@ -73,10 +73,13 @@ const RemoveBookFromLibraryModal = ({
 
 	return (
 		<Dialog
-			header='Добавление книги в библиотеку'
+			header='Удаление книги из библиотеки'
 			visible={true}
 			style={{ width: '450px' }}
-			onHide={onClose}>
+			onHide={onClose}
+			breakpoints={{
+				'375px': '375px',
+			}}>
 			<FormWrapper>
 				<Dropdown
 					onChange={onSelectOwner}

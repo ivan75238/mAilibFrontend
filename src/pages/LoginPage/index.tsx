@@ -186,6 +186,23 @@ const RememberWrapper = styled.div`
 			text-decoration: underline;
 		}
 	}
+
+	@media (max-width: 960px) {
+		margin-bottom: 20px;
+	}
+
+	@media (max-width: 375px) {
+		margin-bottom: 0px;
+
+		button {
+			width: auto;
+
+			span {
+				font-size: ${rem(14)};
+				line-height: 20px;
+			}
+		}
+	}
 `;
 
 export default LoginPage;

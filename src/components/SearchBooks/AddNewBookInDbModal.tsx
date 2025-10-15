@@ -284,13 +284,14 @@ const AddNewBookInDbModal = ({ onClose }: IProps) => {
 		}
 	};
 
-	console.log('manualAuthorName', manualAuthorName);
-
 	return (
 		<Dialog
 			header='Добавление новой книги'
 			visible={true}
-			style={{ width: '650px' }}
+			style={{ width: `650px` }}
+			breakpoints={{
+				'375px': '375px',
+			}}
 			onHide={onClose}>
 			<FormWrapper>
 				<Controller
@@ -503,6 +504,22 @@ const SelectorWrapper = styled.div`
 			width: 100%;
 		}
 	}
+
+	@media (max-width: 375px) {
+		flex-direction: column;
+
+		> div {
+			width: 100%;
+		}
+
+		> span:first-child {
+			width: 100%;
+
+			input {
+				width: 100%;
+			}
+		}
+	}
 `;
 
 const ManualInputWrapper = styled.div`
@@ -513,6 +530,13 @@ const ManualInputWrapper = styled.div`
 	> div:first-child {
 		width: 223px;
 		min-width: 223px;
+	}
+
+	@media (max-width: 375px) {
+		> div:first-child {
+			width: 273px;
+			min-width: 273px;
+		}
 	}
 `;
 

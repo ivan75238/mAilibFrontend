@@ -78,7 +78,10 @@ const UnmarkAsReadBookModal = ({
 			header='Снять пометку о прочитанном'
 			visible={true}
 			style={{ width: '450px' }}
-			onHide={onClose}>
+			onHide={onClose}
+			breakpoints={{
+				'375px': '375px',
+			}}>
 			<FormWrapper>
 				{userData?.family_id ? (
 					<>

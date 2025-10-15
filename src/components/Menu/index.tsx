@@ -7,18 +7,24 @@ import MenuItem from './MenuItem';
 import LogoutButton from './LogoutButton';
 import useUserData from '../../hooks/useUserData';
 
-const Menu = observer(() => {
+interface IProps {
+	open: boolean;
+	setOpen: (val: boolean) => void;
+}
+
+const Menu = observer(({ open, setOpen }: IProps) => {
 	const { data } = useUserData();
 
 	if (!data) return null;
 
 	return (
-		<MainWrapper>
+		<MainWrapper open={open}>
 			<TopWrapper>
 				{menu.map((item) => {
 					return (
 						<MenuItem
 							key={item.path}
+							setOpen={setOpen}
 							{...item}
 						/>
 					);
@@ -38,12 +44,21 @@ const Menu = observer(() => {
 	);
 });
 
-const MainWrapper = styled.div`
+const MainWrapper = styled.div<{ open: boolean }>`
 	display: flex;
 	flex-direction: column;
 	width: 288px;
 	height: 100%;
 	box-shadow: 0px 4px 8px rgba(19, 0, 32, 0.2);
+
+	@media (max-width: 960px) {
+		width: 100vw;
+		height: calc(100% - 84px);
+		display: ${({ open }) => (open ? 'flex' : 'none')};
+		position: absolute;
+		z-index: 100;
+		background-color: white;
+	}
 `;
 
 const TopWrapper = styled.div`
