@@ -7,11 +7,15 @@ import useUserData from './useUserData';
 const useFamilyData = () => {
 	const { data: userData } = useUserData();
 
-	const query = useQuery<IFamily>({
+	const query = useQuery<IFamily | null>({
 		queryKey: [`family`, userData?.id],
 		queryFn: async () => {
 			try {
-				const response = await apiRequester.get<IFamily>(FAMILY_GET);
+				const response = await apiRequester.get<IFamily & { error?: string }>(FAMILY_GET);
+
+				if (response.data?.error) {
+					return null;
+				}
 
 				return response.data;
 			} catch (e) {

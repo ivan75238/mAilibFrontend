@@ -15,6 +15,10 @@ import useUsersDoesntReadBookInFamily from '../../hooks/useUsersDoesntReadBookIn
 import RemoveBookFromLibraryModal from './RemoveBookFromLibraryModal';
 import MarkAsReadBookModal from './MarkAsReadBookModal';
 import UnmarkAsReadBookModal from './UnmarkAsReadBookModal';
+import useAddBookToLibrary from '../../hooks/useAddBookToLibrary';
+import useRemoveBookFromLibrary from '../../hooks/useRemoveBookFromLibrary';
+import useMarkAsReadBook from '../../hooks/useMarkAsReadBook';
+import useUnmarkAsReadBook from '../../hooks/useUnmarkAsReadBook';
 
 const BookPage = () => {
 	const { id, type } = useParams();
@@ -27,6 +31,10 @@ const BookPage = () => {
 	const [visibleMarkAsReadModal, setVisibleMarkAsReadModal] = useState(false);
 	const [visibleUnmarkAsReadModal, setVisibleUnmarkAsReadModal] = useState(false);
 	const descriptionRef = useRef<HTMLDivElement>(null);
+	const mutationAddBook = useAddBookToLibrary(type || '', id || '', [userData?.id || ''], []);
+	const mutationRemoveBook = useRemoveBookFromLibrary(type || '', id || '', [userData?.id || '']);
+	const mutationMarkBook = useMarkAsReadBook(type || '', id || '', [userData?.id || '']);
+	const mutationUnmarkBook = useUnmarkAsReadBook(type || '', id || '', [userData?.id || '']);
 
 	if (!id || !type) {
 		navigate(routes.main.path);
@@ -66,10 +74,12 @@ const BookPage = () => {
 			} else if (data.is_own_by_user) {
 				title = 'Добавлено';
 				disabledButtonAddBook = true;
+				disabledButtonUnmarkAsReadBook = true;
 			} else {
 				title = 'Не добавлено';
 				disabledButtonDeleteBook = true;
 				disabledButtonMarkAsReadBook = true;
+				disabledButtonUnmarkAsReadBook = true;
 			}
 		}
 
@@ -84,22 +94,30 @@ const BookPage = () => {
 								{
 									label: 'Добавить в библиотеку',
 									disabled: disabledButtonAddBook,
-									command: () => setVisibleAddModal(true),
+									command: () =>
+										userData?.family_id ? setVisibleAddModal(true) : mutationAddBook.mutate(),
 								},
 								{
 									label: 'Удалить из библиотеки',
 									disabled: disabledButtonDeleteBook,
-									command: () => setVisibleRemoveModal(true),
+									command: () =>
+										userData?.family_id ? setVisibleRemoveModal(true) : mutationRemoveBook.mutate(),
 								},
 								{
 									label: 'Отметить как прочитанную',
 									disabled: disabledButtonMarkAsReadBook,
-									command: () => setVisibleMarkAsReadModal(true),
+									command: () =>
+										userData?.family_id
+											? setVisibleMarkAsReadModal(true)
+											: mutationMarkBook.mutate(),
 								},
 								{
 									label: 'Снять отметку о прочитанном',
 									disabled: disabledButtonUnmarkAsReadBook,
-									command: () => setVisibleUnmarkAsReadModal(true),
+									command: () =>
+										userData?.family_id
+											? setVisibleUnmarkAsReadModal(true)
+											: mutationUnmarkBook.mutate(),
 								},
 							],
 						},
@@ -109,7 +127,7 @@ const BookPage = () => {
 		] as MenuItem[];
 
 		return obj;
-	}, [data, familyData]);
+	}, [data, familyData, userData]);
 
 	const owners = useMemo(() => {
 		if (!familyData) {
@@ -117,7 +135,7 @@ const BookPage = () => {
 		}
 
 		return familyData.users.filter((i) => !usersDoesntHaveBookInFamily?.includes(i.id));
-	}, [data, usersDoesntHaveBookInFamily]);
+	}, [data, usersDoesntHaveBookInFamily, familyData]);
 
 	const readers = useMemo(() => {
 		if (!familyData) {
@@ -125,7 +143,7 @@ const BookPage = () => {
 		}
 
 		return familyData.users.filter((i) => !usersDoesntReadBookInFamily?.includes(i.id));
-	}, [data, usersDoesntReadBookInFamily]);
+	}, [data, usersDoesntReadBookInFamily, familyData]);
 
 	if (isLoading || !data || isLoadingExistInFamily || isLoadingFamily || isLoadingReadInFamily)
 		return null;

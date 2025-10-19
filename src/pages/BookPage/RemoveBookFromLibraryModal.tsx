@@ -1,12 +1,10 @@
 import { Dialog } from 'primereact/dialog';
 import { useCallback, useMemo, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequester } from '../../utils/apiRequester';
-import { REMOVE_BOOK_FROM_LIBRARY } from '../../config/urls';
 import styled from 'styled-components';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import Button from '../../components/Button';
 import useFamilyData from '../../hooks/useFamilyData';
+import useRemoveBookFromLibrary from '../../hooks/useRemoveBookFromLibrary';
 
 interface IRemoveBookFromLibraryModalProps {
 	onClose: () => void;
@@ -23,7 +21,7 @@ const RemoveBookFromLibraryModal = ({
 }: IRemoveBookFromLibraryModalProps) => {
 	const [selectedOwners, setSelectedOwners] = useState<string[]>([]);
 	const { data } = useFamilyData();
-	const queryClient = useQueryClient();
+	const mutationRemoveBook = useRemoveBookFromLibrary(bookType, bookId, selectedOwners);
 
 	const usersOptions = useMemo(() => {
 		if (!data) {
@@ -48,19 +46,8 @@ const RemoveBookFromLibraryModal = ({
 		[selectedOwners]
 	);
 
-	const mutation = useMutation({
-		mutationFn: async () => {
-			await apiRequester.post(REMOVE_BOOK_FROM_LIBRARY(bookType, bookId), {
-				owner_ids: selectedOwners,
-			});
-			queryClient.refetchQueries({ queryKey: [`book`, bookId, bookType] });
-			queryClient.refetchQueries({ queryKey: [`usersDoesntHaveBookInFamily`, bookId, bookType] });
-			queryClient.refetchQueries({ queryKey: [`usersDoesntReadBookInFamily`, bookId, bookType] });
-		},
-	});
-
 	const onAdd = useCallback(() => {
-		mutation.mutate();
+		mutationRemoveBook.mutate();
 		onClose();
 	}, [selectedOwners]);
 

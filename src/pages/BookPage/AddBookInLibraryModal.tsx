@@ -1,14 +1,12 @@
 import { Dialog } from 'primereact/dialog';
 import { useCallback, useMemo, useState } from 'react';
 import useUserData from '../../hooks/useUserData';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequester } from '../../utils/apiRequester';
-import { ADD_BOOK_TO_LIBRARY } from '../../config/urls';
 import styled from 'styled-components';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import Checkbox from '../../components/Checkbox';
 import Button from '../../components/Button';
 import useFamilyData from '../../hooks/useFamilyData';
+import useAddBookToLibrary from '../../hooks/useAddBookToLibrary';
 
 interface IProps {
 	onClose: () => void;
@@ -27,7 +25,7 @@ const AddBookInLibraryModal = ({
 	const [selectedReaders, setSelectedReaders] = useState<string[]>([]);
 	const { data: userData } = useUserData();
 	const { data } = useFamilyData();
-	const queryClient = useQueryClient();
+	const mutationAddBook = useAddBookToLibrary(bookType, bookId, selectedOwners, selectedReaders);
 
 	const usersOptions = useMemo(() => {
 		if (!data) {
@@ -71,22 +69,10 @@ const AddBookInLibraryModal = ({
 		[selectedReaders]
 	);
 
-	const mutation = useMutation({
-		mutationFn: async () => {
-			await apiRequester.post(ADD_BOOK_TO_LIBRARY(bookType, bookId), {
-				owner_ids: selectedOwners,
-				reader_ids: selectedReaders,
-			});
-			queryClient.refetchQueries({ queryKey: [`book`, bookId, bookType] });
-			queryClient.refetchQueries({ queryKey: [`usersDoesntHaveBookInFamily`, bookId, bookType] });
-			queryClient.refetchQueries({ queryKey: [`usersDoesntReadBookInFamily`, bookId, bookType] });
-		},
-	});
-
 	const onAdd = useCallback(() => {
-		mutation.mutate();
+		mutationAddBook.mutate();
 		onClose();
-	}, [selectedReaders, selectedOwners]);
+	}, [selectedReaders, selectedOwners, mutationAddBook]);
 
 	return (
 		<Dialog

@@ -1,13 +1,11 @@
 import { Dialog } from 'primereact/dialog';
 import { useCallback, useMemo, useState } from 'react';
 import useUserData from '../../hooks/useUserData';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequester } from '../../utils/apiRequester';
-import { UNMARK_BOOK_AS_READED } from '../../config/urls';
 import styled from 'styled-components';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import Button from '../../components/Button';
 import useFamilyData from '../../hooks/useFamilyData';
+import useUnmarkAsReadBook from '../../hooks/useUnmarkAsReadBook';
 
 interface IUnmarkAsReadBookModalProps {
 	onClose: () => void;
@@ -25,7 +23,7 @@ const UnmarkAsReadBookModal = ({
 	const [selectedReaders, setSelectedReaders] = useState<string[]>([]);
 	const { data: userData } = useUserData();
 	const { data } = useFamilyData();
-	const queryClient = useQueryClient();
+	const mutationUnmarkBook = useUnmarkAsReadBook(bookType, bookId, selectedReaders);
 
 	const usersOptions = useMemo(() => {
 		if (!data) {
@@ -57,21 +55,10 @@ const UnmarkAsReadBookModal = ({
 		[selectedReaders]
 	);
 
-	const mutation = useMutation({
-		mutationFn: async () => {
-			await apiRequester.post(UNMARK_BOOK_AS_READED(bookType, bookId), {
-				reader_ids: selectedReaders,
-			});
-			queryClient.refetchQueries({ queryKey: [`book`, bookId, bookType] });
-			queryClient.refetchQueries({ queryKey: [`usersDoesntHaveBookInFamily`, bookId, bookType] });
-			queryClient.refetchQueries({ queryKey: [`usersDoesntReadBookInFamily`, bookId, bookType] });
-		},
-	});
-
 	const onAdd = useCallback(() => {
-		mutation.mutate();
+		mutationUnmarkBook.mutate();
 		onClose();
-	}, [selectedReaders]);
+	}, [selectedReaders, mutationUnmarkBook]);
 
 	return (
 		<Dialog
