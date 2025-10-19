@@ -1,62 +1,80 @@
 import styled from 'styled-components';
-import { DataTable } from 'primereact/datatable';
+import { DataTable, DataTableStateEvent, SortOrder } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Paginator } from 'primereact/paginator';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../../config/routes';
 import useMyBooksData from '../../hooks/useMyBooksData';
+import { useState } from 'react';
 
 const MyBooksPage = () => {
 	const navigate = useNavigate();
+	const [page, setPage] = useState(0);
+	const [limit, setLimit] = useState(20);
+	const [sortField, setSortField] = useState('name');
+	const [sortOrder, setSortOrder] = useState<SortOrder>(1);
 
-	const { isLoading, data } = useMyBooksData();
+	const { isLoading, data } = useMyBooksData(page, limit, sortField, sortOrder);
 
-	if (isLoading || !data) return null;
+	const onSort = (event: DataTableStateEvent) => {
+		setSortField(event.sortField);
+		setSortOrder(event.sortOrder);
+	};
 
 	return (
 		<Wrapper>
 			<PageTitle>Мои книги</PageTitle>
 			<WrapperInner>
-				<DataTable
-					value={data}
-					selectionMode='single'
-					onSelectionChange={(e) =>
-						navigate(routes.book.link(e.value.type, e.value.id || e.value.fantlab_id))
-					}
-					removableSort
-					scrollable
-					scrollHeight='100%'
-					tableStyle={{ width: '100%' }}>
-					<Column
-						sortable
-						field='name'
-						header='Название'
-						filter
-					/>
-					<Column
-						sortable
-						field='authors'
-						header='Автор'
-						filter
-					/>
-					<Column
-						sortable
-						field='genres'
-						header='Жанры'
-						filter
-					/>
-					<Column
-						sortable
-						field='readers'
-						header='Прочитали'
-						filter
-					/>
-				</DataTable>
+				{!isLoading && data && (
+					<DataTable
+						value={data.data}
+						selectionMode='single'
+						onSelectionChange={(e) =>
+							navigate(routes.book.link(e.value.type, e.value.id || e.value.fantlab_id))
+						}
+						removableSort
+						onSort={onSort}
+						sortField={sortField}
+						sortOrder={sortOrder}
+						scrollable
+						scrollHeight='100%'
+						tableStyle={{ width: '100%' }}>
+						<Column
+							sortable
+							field='name'
+							header='Название'
+						/>
+						<Column
+							sortable
+							field='authors'
+							header='Автор'
+						/>
+						<Column
+							field='genres'
+							header='Жанры'
+						/>
+						<Column
+							field='readers'
+							header='Прочитали'
+						/>
+					</DataTable>
+				)}
 			</WrapperInner>
 			<AnaliticBlock>
 				<ParamBlock>
 					<span>Всего:</span>
-					<b>{data.length}</b>
+					<b>{!isLoading && data && data.pagination.total_items}</b>
 				</ParamBlock>
+				<Paginator
+					first={page * limit}
+					rows={limit}
+					totalRecords={!isLoading && data ? data.pagination.total_items : 0}
+					rowsPerPageOptions={[10, 20, 30]}
+					onPageChange={({ rows, page }) => {
+						setPage(page);
+						setLimit(rows);
+					}}
+				/>
 			</AnaliticBlock>
 		</Wrapper>
 	);
@@ -94,7 +112,7 @@ const Wrapper = styled.div`
 
 const WrapperInner = styled.div`
 	width: 100%;
-	height: calc(100% - 40px);
+	height: calc(100% - 55px);
 	gap: 54px;
 	display: flex;
 
@@ -109,6 +127,7 @@ const AnaliticBlock = styled.div`
 	gap: 16px;
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	margin-top: 16px;
 `;
 

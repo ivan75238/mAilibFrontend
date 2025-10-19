@@ -29,3 +29,23 @@ export interface IBookInLibrary {
 	genres: string;
 	type: 'fantlab_work' | 'fantlab_edition' | 'inner_db_work';
 }
+
+export interface IResponseLibrary {
+	data: IBookInLibrary[];
+	pagination: Pagination;
+	sort: Sort;
+}
+
+export interface Pagination {
+	current_page: number;
+	total_pages: number;
+	total_items: number;
+	items_per_page: number;
+	has_previous: boolean;
+	has_next: boolean;
+}
+
+export interface Sort {
+	by: string;
+	order: string;
+}
