@@ -13,6 +13,7 @@ export const BOOKS_BOOK_CREATE = '/books/book/create';
 export const MY_LIBRARY = '/books/library';
 export const BOOKS_RECOMMEND_RANDOM = '/books/recommendations/random';
 export const BOOKS_RECOMMEND_PERSONAL = '/books/recommendations/personal';
+export const BOOKS_RECOMMEND_SIMILAR = '/books/recommendations/similar';
 export const GET_BOOK = (type: string, id: string | number) => `/books/book/${type}/${id}`;
 export const REMOVE_BOOK_FROM_LIBRARY = (type: string, id: string | number) =>
 	`/books/book/${type}/${id}/remove`;

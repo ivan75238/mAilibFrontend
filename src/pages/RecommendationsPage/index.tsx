@@ -1,9 +1,13 @@
-import { useMutation } from '@tanstack/react-query';
+﻿import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../../components/Button';
 import { routes } from '../../config/routes';
-import { BOOKS_RECOMMEND_PERSONAL, BOOKS_RECOMMEND_RANDOM } from '../../config/urls';
+import {
+	BOOKS_RECOMMEND_PERSONAL,
+	BOOKS_RECOMMEND_RANDOM,
+	BOOKS_RECOMMEND_SIMILAR,
+} from '../../config/urls';
 import { apiRequester } from '../../utils/apiRequester';
 
 interface IRecommendationBook {
@@ -14,6 +18,11 @@ interface IRecommendationBook {
 	image_big?: string;
 	authors?: string;
 	genres?: string;
+	cycles?: string;
+	matched_authors?: string;
+	matched_genres?: string;
+	matched_cycles?: string;
+	similarity_score?: number;
 	type: 'fantlab_work' | 'fantlab_edition' | 'inner_db_work';
 }
 
@@ -26,6 +35,10 @@ interface IPersonalCategory {
 
 interface IPersonalResponse {
 	categories: IPersonalCategory[];
+}
+
+interface ISimilarResponse {
+	items: IRecommendationBook[];
 }
 
 const RecommendationsPage = () => {
@@ -45,8 +58,16 @@ const RecommendationsPage = () => {
 		},
 	});
 
+	const similarMutation = useMutation({
+		mutationFn: async () => {
+			const response = await apiRequester.get<ISimilarResponse>(BOOKS_RECOMMEND_SIMILAR);
+			return response.data;
+		},
+	});
+
 	const randomBook = randomMutation.data;
 	const personalCategories = personalMutation.data?.categories || [];
+	const similarBooks = similarMutation.data?.items || [];
 
 	const getImageSrc = (book: IRecommendationBook) => {
 		const image = book.image_small || book.image_big || '';
@@ -56,6 +77,14 @@ const RecommendationsPage = () => {
 
 	const goToBook = (book: IRecommendationBook) => {
 		navigate(routes.book.link(book.type, book.id || book.fantlab_id || ''));
+	};
+
+	const getWhyText = (book: IRecommendationBook) => {
+		const parts: string[] = [];
+		if (book.matched_authors) parts.push(`авторы: ${book.matched_authors}`);
+		if (book.matched_genres) parts.push(`жанры: ${book.matched_genres}`);
+		if (book.matched_cycles) parts.push(`циклы: ${book.matched_cycles}`);
+		return parts.join(' | ');
 	};
 
 	return (
@@ -69,6 +98,7 @@ const RecommendationsPage = () => {
 					loading={randomMutation.isPending}
 					onClick={async () => {
 						personalMutation.reset();
+						similarMutation.reset();
 						await randomMutation.mutateAsync();
 					}}
 				/>
@@ -80,7 +110,20 @@ const RecommendationsPage = () => {
 					loading={personalMutation.isPending}
 					onClick={async () => {
 						randomMutation.reset();
+						similarMutation.reset();
 						await personalMutation.mutateAsync();
+					}}
+				/>
+				<Button
+					width={220}
+					height={44}
+					label='По похожести'
+					outlined
+					loading={similarMutation.isPending}
+					onClick={async () => {
+						randomMutation.reset();
+						personalMutation.reset();
+						await similarMutation.mutateAsync();
 					}}
 				/>
 			</ButtonsRow>
@@ -145,7 +188,36 @@ const RecommendationsPage = () => {
 					</Section>
 				)}
 
-				{!randomBook && !personalCategories.length && (
+				{!!similarBooks.length && (
+					<Section>
+						<SectionTitle>Похожие к вашим прочитанным</SectionTitle>
+						<CardsList>
+							{similarBooks.map((book, index) => {
+								const imageSrc = getImageSrc(book);
+								const cardKey = `${book.type}-${book.id || book.fantlab_id || index}`;
+								return (
+									<BookCard key={cardKey} onClick={() => goToBook(book)}>
+										<CoverWrapper>
+											{imageSrc ? (
+												<img src={imageSrc} alt={book.name} />
+											) : (
+												<CoverPlaceholder />
+											)}
+										</CoverWrapper>
+										<BookInfo>
+											<BookName>{book.name}</BookName>
+											<BookMeta>Автор: {book.authors || 'Не указан'}</BookMeta>
+											<BookMeta>Жанр: {book.genres || 'Не указан'}</BookMeta>
+											{getWhyText(book) && <WhyText>Почему: {getWhyText(book)}</WhyText>}
+										</BookInfo>
+									</BookCard>
+								);
+							})}
+						</CardsList>
+					</Section>
+				)}
+
+				{!randomBook && !personalCategories.length && !similarBooks.length && (
 					<PlaceholderText>Выберите тип рекомендации выше</PlaceholderText>
 				)}
 			</ResultsBlock>
@@ -205,6 +277,12 @@ const CategoriesGrid = styled.div`
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 	gap: 12px;
+`;
+
+const CardsList = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 `;
 
 const CategoryCard = styled.div`
@@ -274,6 +352,11 @@ const BookName = styled.div`
 const BookMeta = styled.div`
 	font-size: 13px;
 	color: #4b5563;
+`;
+
+const WhyText = styled.div`
+	font-size: 12px;
+	color: #6b7280;
 `;
 
 const EmptyText = styled.div`
