@@ -11,6 +11,8 @@ export const CHANGE_PASSWORD = '/changePassword';
 export const BOOKS_SEARCH = '/books/search';
 export const BOOKS_BOOK_CREATE = '/books/book/create';
 export const MY_LIBRARY = '/books/library';
+export const BOOKS_RECOMMEND_RANDOM = '/books/recommendations/random';
+export const BOOKS_RECOMMEND_PERSONAL = '/books/recommendations/personal';
 export const GET_BOOK = (type: string, id: string | number) => `/books/book/${type}/${id}`;
 export const REMOVE_BOOK_FROM_LIBRARY = (type: string, id: string | number) =>
 	`/books/book/${type}/${id}/remove`;
@@ -38,4 +40,5 @@ export const GENRES_ALL = '/genres/all';
 export const CYCLES_ALL = '/cycles/all';
 
 export const ANALYTICS_FAMILY = '/analytics/family';
+export const ANALYTICS_FAMILY_RECENT = '/analytics/family/recent';
 export const ANALYTICS_USER = '/analytics/user';

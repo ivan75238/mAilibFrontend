@@ -16,6 +16,7 @@ import { Button as ButtonPrimereact } from 'primereact/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequester } from '../../utils/apiRequester';
 import { LOGIN } from '../../config/urls';
+import { parseApiError } from '../../utils/apiError';
 
 interface IFormData {
 	email: string;
@@ -49,6 +50,7 @@ const LoginPage = () => {
 	const {
 		control,
 		handleSubmit,
+		setError,
 		formState: { errors },
 	} = useForm({
 		mode: 'onSubmit',
@@ -64,22 +66,26 @@ const LoginPage = () => {
 		mutationFn: (formData: IFormData) => {
 			return apiRequester.post<{
 				accessToken: string;
-				refreshToken: string;
 			}>(LOGIN, {
 				password: formData.password,
 				email: formData.email,
 			});
 		},
-		onSuccess: (response, formData) => {
-			if (formData.rememberMe) {
-				localStorage.setItem('accessToken', response.data.accessToken);
-				localStorage.setItem('refreshToken', response.data.refreshToken);
-			} else {
-				sessionStorage.setItem('accessToken', response.data.accessToken);
-				sessionStorage.setItem('refreshToken', response.data.refreshToken);
-			}
+		onSuccess: (_response) => {
 			queryClient.refetchQueries({ queryKey: ['userData'] });
 			navigate(routes.myBooks.link());
+	},
+	onError: (error: any) => {
+		const fieldErrors = parseApiError(error).details?.fieldErrors;
+		if (!fieldErrors) return;
+
+			const mapError = (key: keyof IFormData) => {
+				const msg = fieldErrors?.[key]?.[0];
+				if (msg) setError(key, { type: 'server', message: msg });
+			};
+
+			mapError('email');
+			mapError('password');
 		},
 	});
 

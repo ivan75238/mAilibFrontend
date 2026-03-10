@@ -14,10 +14,6 @@ const LogoutButton = () => {
 			return apiRequester.post(LOGOUT);
 		},
 		onSuccess: async () => {
-			localStorage.removeItem('accessToken');
-			localStorage.removeItem('refreshToken');
-			sessionStorage.removeItem('accessToken');
-			sessionStorage.removeItem('refreshToken');
 			navigate(routes.main.link());
 			queryClient.removeQueries();
 			await queryClient.cancelQueries();

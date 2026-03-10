@@ -16,6 +16,9 @@ const useUserData = () => {
 			}
 		},
 		retry: false,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		staleTime: 5 * 60 * 1000,
 	});
 
 	return query;

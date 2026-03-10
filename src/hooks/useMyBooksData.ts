@@ -4,9 +4,15 @@ import { apiRequester } from '../utils/apiRequester';
 import { MY_LIBRARY } from '../config/urls';
 import { IResponseLibrary } from '../interface/IBookInLibrary';
 
-const useMyBooksData = (page: number, limit: number, sortField: string, sortOrder: SortOrder) => {
+const useMyBooksData = (
+	page: number,
+	limit: number,
+	sortField: string,
+	sortOrder: SortOrder,
+	search: string
+) => {
 	const query = useQuery<IResponseLibrary>({
-		queryKey: [`my-books`, page, limit, sortField, sortOrder],
+		queryKey: [`my-books`, page, limit, sortField, sortOrder, search],
 		queryFn: async () => {
 			try {
 				let sortF = sortField;
@@ -18,14 +24,15 @@ const useMyBooksData = (page: number, limit: number, sortField: string, sortOrde
 						sortF = 'authors_info';
 						break;
 					case 'genres':
-						sortF = 'authors_info';
+						sortF = 'genres_info';
 						break;
 				}
 
 				const sortO = sortOrder === 1 ? 'ASC' : 'DESC';
+				const query = search && search.length >= 3 ? `&q=${encodeURIComponent(search)}` : '';
 
 				const response = await apiRequester.get<IResponseLibrary>(
-					`${MY_LIBRARY}?page=${page + 1}&limit=${limit}&sortBy=${sortF}&sortOrder=${sortO}`
+					`${MY_LIBRARY}?page=${page + 1}&limit=${limit}&sortBy=${sortF}&sortOrder=${sortO}${query}`
 				);
 
 				if (response.data.data) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup';
@@ -14,6 +14,7 @@ import { RESEND_CODE, VERIFY } from '../../config/urls';
 import { observer } from 'mobx-react-lite';
 import { InputOtp } from 'primereact/inputotp';
 import { generalStore } from '../../stores/generalStore';
+import { parseApiError } from '../../utils/apiError';
 
 interface IFormData {
 	code: string;
@@ -36,7 +37,7 @@ const VerifyPage = observer(() => {
 				setTimeLeft((prevTime) => prevTime - 1);
 			}, 1000);
 		} else if (timeLeft === 0) {
-			clearInterval(interval!);
+			if (interval) { clearInterval(interval); }
 			setIsActive(false);
 		}
 
@@ -69,7 +70,7 @@ const VerifyPage = observer(() => {
 		return `${mins}:${secs}`;
 	};
 
-	const { control, handleSubmit } = useForm({
+	const { control, handleSubmit, setError, formState: { errors } } = useForm({
 		mode: 'onSubmit',
 		resolver: yupResolver(schema),
 		defaultValues: {
@@ -86,6 +87,13 @@ const VerifyPage = observer(() => {
 			localStorage.removeItem('email');
 			generalStore.showSuccess('Аккаунт подтвержден, можете авторизоваться', 'Успех!');
 			navigate(routes.main.link());
+		},
+	onError: (error: any) => {
+		const fieldErrors = parseApiError(error).details?.fieldErrors;
+		if (!fieldErrors) return;
+
+			const msg = fieldErrors?.code?.[0];
+			if (msg) setError('code', { type: 'server', message: msg });
 		},
 	});
 
@@ -117,6 +125,7 @@ const VerifyPage = observer(() => {
 					name='code'
 					control={control}
 				/>
+			{errors?.code?.message && <ErrorText>{errors.code.message}</ErrorText>}
 				<Button
 					label={'Завершить регистрацию'}
 					onClick={handleSubmit(onSave)}
@@ -203,6 +212,15 @@ const TimerText = styled.div`
 	text-align: center;
 	color: #262626;
 	margin-top: -15px;
+`;
+
+
+const ErrorText = styled.div`
+	width: 100%;
+	font-size: 16px;
+	color: #e53935;
+	text-align: center;
+	margin-top: -12px;
 `;
 
 export default VerifyPage;

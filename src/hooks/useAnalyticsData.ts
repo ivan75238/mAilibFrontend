@@ -12,13 +12,8 @@ const useAnalyticsData = () => {
 		query = useQuery<IAnalytics[]>({
 			queryKey: [`family-analytics`, user?.id],
 			queryFn: async () => {
-				try {
-					const response = await apiRequester.get<IAnalytics[]>(ANALYTICS_FAMILY);
-
-					return response.data;
-				} catch (e) {
-					throw new Error('Не удалось получить данные');
-				}
+				const response = await apiRequester.get<IAnalytics[]>(ANALYTICS_FAMILY);
+				return response.data;
 			},
 			enabled: !isLoadingUser,
 		});
@@ -26,13 +21,8 @@ const useAnalyticsData = () => {
 		query = useQuery<IAnalytics[]>({
 			queryKey: [`user-analytics`, user?.id],
 			queryFn: async () => {
-				try {
-					const response = await apiRequester.get<IAnalytics[]>(ANALYTICS_USER);
-
-					return response.data;
-				} catch (e) {
-					throw new Error('Не удалось получить данные');
-				}
+				const response = await apiRequester.get<IAnalytics[]>(ANALYTICS_USER);
+				return response.data;
 			},
 			enabled: !isLoadingUser,
 		});

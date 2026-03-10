@@ -1,19 +1,24 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
+import { useNavigate } from 'react-router-dom';
+import useUserData from '../hooks/useUserData';
+import { routes } from '../config/routes';
 
 export interface Props {
 	children: ReactNode;
 }
 
 const AuthGuard: FC<Props> = observer(({ children }) => {
-	let access_token = localStorage.getItem('accessToken');
-	if (!access_token) {
-		access_token = sessionStorage.getItem('accessToken');
-	}
+	const navigate = useNavigate();
+	const { isLoading, isError } = useUserData();
 
-	if (!access_token) {
-		return null;
-	}
+	useEffect(() => {
+		if (isError) {
+			navigate(routes.main.link());
+		}
+	}, [isError]);
+
+	if (isLoading || isError) return null;
 
 	return <>{children}</>;
 });

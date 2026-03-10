@@ -15,6 +15,8 @@ import FamilyPage from '../pages/FamilyPage';
 import MyBooksPage from '../pages/MyBooksPage';
 import AnalyticsIcon from '../svg/AnalyticsIcon';
 import AnalyticsPage from '../pages/AnalyticsPage';
+import RecommendationsIcon from '../svg/RecommendationsIcon';
+import RecommendationsPage from '../pages/RecommendationsPage';
 
 export interface Route {
 	path: string;
@@ -112,6 +114,15 @@ export const routes: Routes = {
 		title: 'Аналитика',
 		icon: <AnalyticsIcon />,
 	},
+	recommendations: {
+		path: '/recommendations',
+		link: () => `/recommendations`,
+		element: RecommendationsPage,
+		guard: AuthGuard,
+		layout: MainLayout,
+		title: 'Рекомендации',
+		icon: <RecommendationsIcon />,
+	},
 };
 
-export const menu = [routes.myBooks, routes.family, routes.analytics];
+export const menu = [routes.myBooks, routes.family, routes.analytics, routes.recommendations];

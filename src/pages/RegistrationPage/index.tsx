@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+﻿import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup';
@@ -14,6 +14,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiRequester } from '../../utils/apiRequester';
 import { REGISTRATION } from '../../config/urls';
 import { observer } from 'mobx-react-lite';
+import { parseApiError } from '../../utils/apiError';
 
 interface IFormData {
 	email: string;
@@ -64,6 +65,7 @@ const RegistrationPage = observer(() => {
 	const {
 		control,
 		handleSubmit,
+		setError,
 		formState: { errors },
 	} = useForm({
 		mode: 'onSubmit',
@@ -85,6 +87,22 @@ const RegistrationPage = observer(() => {
 		onSuccess: (_response, formData) => {
 			localStorage.setItem('email', formData.email);
 			navigate(routes.verify.link());
+		},
+	onError: (error: any) => {
+		const fieldErrors = parseApiError(error).details?.fieldErrors;
+		if (!fieldErrors) return;
+
+			const mapError = (key: keyof IFormData) => {
+				const msg = fieldErrors?.[key]?.[0];
+				if (msg) setError(key, { type: 'server', message: msg });
+			};
+
+			mapError('email');
+			mapError('password');
+			mapError('passwordRepeat');
+			mapError('firstName');
+			mapError('lastName');
+			mapError('middleName');
 		},
 	});
 

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+﻿import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup/dist/yup';
@@ -15,6 +15,7 @@ import { CHANGE_PASSWORD } from '../../config/urls';
 import { observer } from 'mobx-react-lite';
 import { generalStore } from '../../stores/generalStore';
 import { MIN_PASS_LENGTH } from '../../config/config';
+import { parseApiError } from '../../utils/apiError';
 
 interface IFormData {
 	password: string;
@@ -52,6 +53,7 @@ const ChangePasswordPage = observer(() => {
 	const {
 		control,
 		handleSubmit,
+		setError,
 		formState: { errors },
 	} = useForm({
 		mode: 'onSubmit',
@@ -69,6 +71,18 @@ const ChangePasswordPage = observer(() => {
 		onSuccess: (_response) => {
 			navigate(routes.main.link());
 			generalStore.showSuccess('Ваш пароль успешно изменён. Вы можете продолжить авторизациию.');
+		},
+	onError: (error: any) => {
+		const fieldErrors = parseApiError(error).details?.fieldErrors;
+		if (!fieldErrors) return;
+
+			const mapError = (key: keyof IFormData) => {
+				const msg = fieldErrors?.[key]?.[0];
+				if (msg) setError(key, { type: 'server', message: msg });
+			};
+
+			mapError('password');
+			mapError('passwordRepeat');
 		},
 	});
 
