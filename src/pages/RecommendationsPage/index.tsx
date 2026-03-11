@@ -7,6 +7,7 @@ import {
 	BOOKS_RECOMMEND_PERSONAL,
 	BOOKS_RECOMMEND_RANDOM,
 	BOOKS_RECOMMEND_SIMILAR,
+	BOOKS_RECOMMEND_SEMANTIC_FREE,
 } from '../../config/urls';
 import { apiRequester } from '../../utils/apiRequester';
 
@@ -41,6 +42,10 @@ interface ISimilarResponse {
 	items: IRecommendationBook[];
 }
 
+interface ISemanticFreeResponse {
+	items: IRecommendationBook[];
+}
+
 const RecommendationsPage = () => {
 	const navigate = useNavigate();
 
@@ -65,9 +70,19 @@ const RecommendationsPage = () => {
 		},
 	});
 
+	const semanticFreeMutation = useMutation({
+		mutationFn: async () => {
+			const response = await apiRequester.get<ISemanticFreeResponse>(
+				BOOKS_RECOMMEND_SEMANTIC_FREE
+			);
+			return response.data;
+		},
+	});
+
 	const randomBook = randomMutation.data;
 	const personalCategories = personalMutation.data?.categories || [];
 	const similarBooks = similarMutation.data?.items || [];
+	const semanticFreeBooks = semanticFreeMutation.data?.items || [];
 
 	const getImageSrc = (book: IRecommendationBook) => {
 		const image = book.image_small || book.image_big || '';
@@ -99,6 +114,7 @@ const RecommendationsPage = () => {
 					onClick={async () => {
 						personalMutation.reset();
 						similarMutation.reset();
+						semanticFreeMutation.reset();
 						await randomMutation.mutateAsync();
 					}}
 				/>
@@ -111,6 +127,7 @@ const RecommendationsPage = () => {
 					onClick={async () => {
 						randomMutation.reset();
 						similarMutation.reset();
+						semanticFreeMutation.reset();
 						await personalMutation.mutateAsync();
 					}}
 				/>
@@ -123,7 +140,21 @@ const RecommendationsPage = () => {
 					onClick={async () => {
 						randomMutation.reset();
 						personalMutation.reset();
+						semanticFreeMutation.reset();
 						await similarMutation.mutateAsync();
+					}}
+				/>
+				<Button
+					width={220}
+					height={44}
+					label='По смыслу'
+					outlined
+					loading={semanticFreeMutation.isPending}
+					onClick={async () => {
+						randomMutation.reset();
+						personalMutation.reset();
+						similarMutation.reset();
+						await semanticFreeMutation.mutateAsync();
 					}}
 				/>
 			</ButtonsRow>
@@ -217,7 +248,38 @@ const RecommendationsPage = () => {
 					</Section>
 				)}
 
-				{!randomBook && !personalCategories.length && !similarBooks.length && (
+				{!!semanticFreeBooks.length && (
+					<Section>
+						<SectionTitle>По смыслу описаний</SectionTitle>
+						<CardsList>
+							{semanticFreeBooks.map((book, index) => {
+								const imageSrc = getImageSrc(book);
+								const cardKey = `semantic-${book.type}-${book.id || book.fantlab_id || index}`;
+								return (
+									<BookCard key={cardKey} onClick={() => goToBook(book)}>
+										<CoverWrapper>
+											{imageSrc ? (
+												<img src={imageSrc} alt={book.name} />
+											) : (
+												<CoverPlaceholder />
+											)}
+										</CoverWrapper>
+										<BookInfo>
+											<BookName>{book.name}</BookName>
+											<BookMeta>Автор: {book.authors || 'Не указан'}</BookMeta>
+											<BookMeta>Жанр: {book.genres || 'Не указан'}</BookMeta>
+										</BookInfo>
+									</BookCard>
+								);
+							})}
+						</CardsList>
+					</Section>
+				)}
+
+				{!randomBook &&
+					!personalCategories.length &&
+					!similarBooks.length &&
+					!semanticFreeBooks.length && (
 					<PlaceholderText>Выберите тип рекомендации выше</PlaceholderText>
 				)}
 			</ResultsBlock>

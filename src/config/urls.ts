@@ -14,7 +14,10 @@ export const MY_LIBRARY = '/books/library';
 export const BOOKS_RECOMMEND_RANDOM = '/books/recommendations/random';
 export const BOOKS_RECOMMEND_PERSONAL = '/books/recommendations/personal';
 export const BOOKS_RECOMMEND_SIMILAR = '/books/recommendations/similar';
+export const BOOKS_RECOMMEND_SEMANTIC_FREE = '/books/recommendations/semantic-free';
 export const GET_BOOK = (type: string, id: string | number) => `/books/book/${type}/${id}`;
+export const GET_BOOK_EXTERNAL_RECOMMENDATIONS = (type: string, id: string | number) =>
+	`/books/book/${type}/${id}/recommendations/external`;
 export const REMOVE_BOOK_FROM_LIBRARY = (type: string, id: string | number) =>
 	`/books/book/${type}/${id}/remove`;
 export const ADD_BOOK_TO_LIBRARY = (type: string, id: string | number) =>

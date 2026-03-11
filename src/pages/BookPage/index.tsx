@@ -19,6 +19,7 @@ import useAddBookToLibrary from '../../hooks/useAddBookToLibrary';
 import useRemoveBookFromLibrary from '../../hooks/useRemoveBookFromLibrary';
 import useMarkAsReadBook from '../../hooks/useMarkAsReadBook';
 import useUnmarkAsReadBook from '../../hooks/useUnmarkAsReadBook';
+import useExternalBookRecommendations from '../../hooks/useExternalBookRecommendations';
 
 const BookPage = () => {
 	const { id, type } = useParams();
@@ -46,6 +47,7 @@ const BookPage = () => {
 		useUsersDoesntHaveBookInFamily(id, type);
 	const { isLoading: isLoadingReadInFamily, data: usersDoesntReadBookInFamily } =
 		useUsersDoesntReadBookInFamily(id, type);
+	const { data: externalRecommendationsData } = useExternalBookRecommendations(id, type);
 
 	const bookActions = useMemo(() => {
 		if (!data) {
@@ -206,6 +208,51 @@ const BookPage = () => {
 						data.description &&
 						!showMore && <ShowMoreButton onClick={() => setShowMore(true)}>Далее</ShowMoreButton>}
 				</DescriptionWrapper>
+				<ExternalRecommendationsWrapper>
+					<ExternalRecommendationsTitle>Похожие книги</ExternalRecommendationsTitle>
+					{externalRecommendationsData?.items?.length ? (
+						<ExternalRecommendationsList>
+							{externalRecommendationsData.items.map((item) => (
+								<ExternalRecommendationCard key={item.key}>
+									<ExternalRecommendationCover>
+										{item.cover_url ? (
+											<img
+												src={item.cover_url}
+												alt={item.title}
+											/>
+										) : (
+											<ExternalRecommendationCoverPlaceholder />
+										)}
+									</ExternalRecommendationCover>
+									<ExternalRecommendationInfo>
+										<ExternalRecommendationName>{item.title}</ExternalRecommendationName>
+										<ExternalRecommendationMeta>
+											Автор: {item.authors || 'Не указан'}
+										</ExternalRecommendationMeta>
+										<ExternalRecommendationMeta>
+											Жанры: {item.genres?.length ? item.genres.join(', ') : 'Не указаны'}
+										</ExternalRecommendationMeta>
+										{!!item.reason?.length && (
+											<ExternalRecommendationReason>
+												Похожесть: {item.reason.join(' | ')}
+											</ExternalRecommendationReason>
+										)}
+										<ExternalRecommendationLink
+											href={item.external_url}
+											target='_blank'
+											rel='noreferrer'>
+											Открыть в OpenLibrary
+										</ExternalRecommendationLink>
+									</ExternalRecommendationInfo>
+								</ExternalRecommendationCard>
+							))}
+						</ExternalRecommendationsList>
+					) : (
+						<ExternalRecommendationsEmpty>
+							Идет поиск или пока нет похожих книг.
+						</ExternalRecommendationsEmpty>
+					)}
+				</ExternalRecommendationsWrapper>
 			</RightColumn>
 			{visibleAddModal && (
 				<AddBookInLibraryModal
@@ -538,6 +585,101 @@ const ButtonAddedWrapper = styled.div`
 	@media (max-width: 400px) {
 		width: 240px;
 	}
+`;
+
+const ExternalRecommendationsWrapper = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 12px;
+`;
+
+const ExternalRecommendationsTitle = styled.div`
+	font-style: normal;
+	font-weight: 500;
+	font-size: 28px;
+	line-height: 34px;
+	color: #262626;
+
+	@media (max-width: 960px) {
+		font-size: 20px;
+		line-height: 24px;
+	}
+`;
+
+const ExternalRecommendationsList = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+`;
+
+const ExternalRecommendationCard = styled.div`
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	padding: 10px;
+	display: flex;
+	gap: 10px;
+`;
+
+const ExternalRecommendationCover = styled.div`
+	width: 46px;
+	height: 64px;
+	flex: 0 0 auto;
+	border-radius: 4px;
+	overflow: hidden;
+	background: #f3f4f6;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+`;
+
+const ExternalRecommendationCoverPlaceholder = styled.div`
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(135deg, #e5e7eb, #f3f4f6);
+`;
+
+const ExternalRecommendationInfo = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+`;
+
+const ExternalRecommendationName = styled.div`
+	font-size: 15px;
+	font-weight: 500;
+	color: #262626;
+`;
+
+const ExternalRecommendationMeta = styled.div`
+	font-size: 13px;
+	color: #4b5563;
+`;
+
+const ExternalRecommendationReason = styled.div`
+	font-size: 12px;
+	color: #6b7280;
+`;
+
+const ExternalRecommendationLink = styled.a`
+	font-size: 13px;
+	color: #bf8afc;
+	text-decoration: none;
+	width: fit-content;
+
+	:hover {
+		text-decoration: underline;
+	}
+`;
+
+const ExternalRecommendationsEmpty = styled.div`
+	font-size: 14px;
+	color: #6b7280;
 `;
 
 export default BookPage;
