@@ -61,6 +61,7 @@ const RemoveBookFromLibraryModal = ({
 	return (
 		<Dialog
 			header='Удаление книги из библиотеки'
+			appendTo='self'
 			visible={true}
 			style={{ width: '450px' }}
 			onHide={onClose}

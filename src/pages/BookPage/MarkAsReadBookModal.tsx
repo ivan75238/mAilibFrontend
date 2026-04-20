@@ -63,6 +63,7 @@ const MarkAsReadBookModal = ({
 	return (
 		<Dialog
 			header='Пометить прочитанной'
+			appendTo='self'
 			visible={true}
 			style={{ width: '450px' }}
 			onHide={onClose}

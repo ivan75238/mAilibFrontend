@@ -63,6 +63,7 @@ const UnmarkAsReadBookModal = ({
 	return (
 		<Dialog
 			header='Снять пометку о прочитанном'
+			appendTo='self'
 			visible={true}
 			style={{ width: '450px' }}
 			onHide={onClose}
