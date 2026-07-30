@@ -287,6 +287,7 @@ const AddNewBookInDbModal = ({ onClose }: IProps) => {
 	return (
 		<Dialog
 			header='Добавление новой книги'
+			appendTo='self'
 			visible={true}
 			style={{ width: `650px` }}
 			breakpoints={{

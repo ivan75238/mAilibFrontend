@@ -21,30 +21,47 @@ const SearchBooks = observer(() => {
 	const navigate = useNavigate();
 	const [visibleAddModal, setVisibleAddModal] = useState(false);
 
-	const itemTemplate = useCallback((item: IBook) => {
-		if (item.id === '-1') {
-			return <ItemWrapper>{item.name}</ItemWrapper>;
-		}
-
-		return (
-			<ItemWrapper>
-				{item.image_small || item.image_big ? (
-					item.type === 'inner_db_work' ? (
-						<img src={item.image_big} />
-					) : (
-						<img src={`https://fantlab.ru/${item.image_small || item.image_big}`} />
-					)
-				) : (
-					<EmptyImageWrapper>
-						<BookEmptyImageIcon />
-					</EmptyImageWrapper>
-				)}
-				<span>
-					«{item.name}» {item.authors.map((i) => i.name).join(', ')}
-				</span>
-			</ItemWrapper>
-		);
+	const openAddModal = useCallback(() => {
+		// Defer so AutoComplete overlay teardown doesn't swallow the dialog open.
+		window.setTimeout(() => setVisibleAddModal(true), 0);
 	}, []);
+
+	const itemTemplate = useCallback(
+		(item: IBook) => {
+			if (item.id === '-1') {
+				return (
+					<ItemWrapper
+						onMouseDown={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							openAddModal();
+						}}>
+						{item.name}
+					</ItemWrapper>
+				);
+			}
+
+			return (
+				<ItemWrapper>
+					{item.image_small || item.image_big ? (
+						item.type === 'inner_db_work' ? (
+							<img src={item.image_big} />
+						) : (
+							<img src={`https://fantlab.ru/${item.image_small || item.image_big}`} />
+						)
+					) : (
+						<EmptyImageWrapper>
+							<BookEmptyImageIcon />
+						</EmptyImageWrapper>
+					)}
+					<span>
+						«{item.name}» {item.authors.map((i) => i.name).join(', ')}
+					</span>
+				</ItemWrapper>
+			);
+		},
+		[openAddModal]
+	);
 
 	const mutation = useMutation({
 		mutationFn: (searchString: string) => {
@@ -128,9 +145,9 @@ const SearchBooks = observer(() => {
 					onSelect={(e) => {
 						const val = e.value as unknown as IBook;
 
-						if (val.id === '-1') {
-							setVisibleAddModal(true);
-						} else {
+						if (val?.id === '-1') {
+							openAddModal();
+						} else if (val?.id || val?.fantlab_id) {
 							navigate(routes.book.link(val.type, val.id || val.fantlab_id));
 						}
 					}}
